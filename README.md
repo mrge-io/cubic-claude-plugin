@@ -81,9 +81,9 @@ These activate automatically based on what you're doing:
 The plugin connects to cubic's MCP server, giving Claude access to 9 tools:
 
 **Wiki**: `list_wikis`, `list_wiki_pages`, `get_wiki_page`
-**Codebase Scans**: `list_scans`, `get_scan`, `get_violation`
+**Codebase Scans**: `list_scans`, `get_scan`, `get_issue`
 **Review Learnings**: `list_learnings`, `get_learning`
-**PR Reviews**: `get_pr_violations`
+**PR Reviews**: `get_pr_issues`
 
 ## Plugin Structure
 

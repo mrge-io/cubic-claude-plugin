@@ -20,7 +20,7 @@ This skill surfaces AI code review comments and issues from cubic when working o
 1. Detect the current repository from git remote: `git remote get-url origin`
 2. Detect the current branch: `git branch --show-current`
 3. Find the PR number: `gh pr view --json number --jq .number`
-4. Call `get_pr_violations` with repo, pullNumber, and owner to get all published issues with full content
+4. Call `get_pr_issues` with repo, pullNumber, and owner to get all published issues with full content
 5. Filter issues to prioritize:
    - Files the user is currently editing
    - Unaddressed issues (aiAddressed = false)
