@@ -18,7 +18,7 @@ Access cubic's AI code review insights directly from Claude Code. Get PR review 
 /plugin marketplace add mrge-io/cubic-claude-plugin
 
 # Step 2: Install the plugin
-/plugin install cubic@cubic-plugin-marketplace
+/plugin install cubic@cubic
 ```
 
 > **Requires** [Claude Code](https://code.claude.com) v1.0.33+
@@ -30,7 +30,7 @@ To make cubic automatically available for all team members in a repository, add 
 ```json
 {
   "extraKnownMarketplaces": {
-    "cubic-plugin-marketplace": {
+    "cubic": {
       "source": {
         "source": "github",
         "repo": "mrge-io/cubic-claude-plugin"
@@ -38,7 +38,7 @@ To make cubic automatically available for all team members in a repository, add 
     }
   },
   "enabledPlugins": {
-    "cubic@cubic-plugin-marketplace": true
+    "cubic@cubic": true
   }
 }
 ```
