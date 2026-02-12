@@ -1,0 +1,22 @@
+{
+  "name": "cubic",
+  "description": "AI code review insights from Cubic — review violations, team wikis, codebase scans, and learnings directly in Claude Code",
+  "version": "1.0.0",
+  "author": {
+    "name": "Cubic",
+    "email": "support@cubic.dev",
+    "url": "https://www.cubic.dev"
+  },
+  "homepage": "https://www.cubic.dev/docs/integrations/mcp-server",
+  "repository": "https://github.com/aspect-build/cubic-claude-plugin",
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "ai-review",
+    "cubic",
+    "wiki",
+    "security",
+    "codebase-scan",
+    "learnings"
+  ]
+}
