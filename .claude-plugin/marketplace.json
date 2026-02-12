@@ -1,21 +1,21 @@
 {
   "name": "cubic",
   "owner": {
-    "name": "Cubic",
-    "email": "support@cubic.dev"
+    "name": "cubic",
+    "email": "contact@cubic.dev"
   },
   "metadata": {
-    "description": "AI code review insights from Cubic — review violations, team wikis, codebase scans, and learnings directly in Claude Code"
+    "description": "AI code review insights from cubic, review issues, team wikis, codebase scans, and learnings directly in Claude Code"
   },
   "plugins": [
     {
       "name": "cubic",
       "source": "./",
-      "description": "AI code review insights from Cubic — review violations, team wikis, codebase scans, and learnings directly in Claude Code",
+      "description": "AI code review insights from cubic, review issues, team wikis, codebase scans, and learnings directly in Claude Code",
       "version": "1.0.0",
       "author": {
-        "name": "Cubic",
-        "email": "support@cubic.dev"
+        "name": "cubic",
+        "email": "contact@cubic.dev"
       },
       "homepage": "https://docs.cubic.dev/integrations/mcp-server#mcp-server",
       "repository": "https://github.com/mrge-io/cubic-claude-plugin",

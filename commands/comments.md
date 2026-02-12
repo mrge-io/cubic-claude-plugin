@@ -22,7 +22,7 @@ If not, detect the current PR automatically.
    - Run `gh pr view --json number --jq .number` to find the open PR for this branch
    - If no PR is found, tell the user no open PR exists for this branch
 
-3. **Get comments**: Call `get_pr_violations` with the repo, pullNumber, and owner. This returns all open review comments cubic posted on the PR, grouped by file with full content.
+3. **Get comments**: Call `get_pr_violations` with the repo, pullNumber, and owner. This returns all open review issues cubic posted on the PR, grouped by file with full content.
 
 4. **Present results**: Display the comments grouped by file. For each comment show:
    - File and line numbers
