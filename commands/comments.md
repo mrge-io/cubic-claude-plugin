@@ -1,12 +1,12 @@
 ---
-description: Show Cubic's review comments on a pull request
+description: Show cubic's review comments on a pull request
 argument-hint: [pr-number]
 allowed-tools: [Bash, cubic:get_pr_violations]
 ---
 
-# Cubic PR Comments
+# cubic PR Comments
 
-Show the review comments that Cubic posted on a pull request.
+Show the review comments that cubic posted on a pull request.
 
 ## Arguments
 
@@ -22,7 +22,7 @@ If not, detect the current PR automatically.
    - Run `gh pr view --json number --jq .number` to find the open PR for this branch
    - If no PR is found, tell the user no open PR exists for this branch
 
-3. **Get comments**: Call `get_pr_violations` with the repo, pullNumber, and owner. This returns all open review comments Cubic posted on the PR, grouped by file with full content.
+3. **Get comments**: Call `get_pr_violations` with the repo, pullNumber, and owner. This returns all open review comments cubic posted on the PR, grouped by file with full content.
 
 4. **Present results**: Display the comments grouped by file. For each comment show:
    - File and line numbers

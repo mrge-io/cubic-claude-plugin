@@ -1,12 +1,12 @@
 ---
-description: Show Cubic codebase scan results and security violations
+description: Show cubic codebase scan results and security violations
 argument-hint: [scan-id]
 allowed-tools: [Bash, cubic:list_scans, cubic:get_scan, cubic:get_violation]
 ---
 
-# Cubic Codebase Scan
+# cubic Codebase Scan
 
-Show codebase scan results from Cubic, including security vulnerabilities and code quality issues.
+Show codebase scan results from cubic, including security vulnerabilities and code quality issues.
 
 ## Arguments
 
