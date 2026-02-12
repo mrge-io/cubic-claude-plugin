@@ -1,0 +1,34 @@
+{
+  "name": "cubic-plugin-marketplace",
+  "owner": {
+    "name": "Cubic",
+    "email": "support@cubic.dev"
+  },
+  "metadata": {
+    "description": "AI code review insights from Cubic — review violations, team wikis, codebase scans, and learnings directly in Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "cubic",
+      "source": "./",
+      "description": "AI code review insights from Cubic — review violations, team wikis, codebase scans, and learnings directly in Claude Code",
+      "version": "1.0.0",
+      "author": {
+        "name": "Cubic",
+        "email": "support@cubic.dev"
+      },
+      "homepage": "https://docs.cubic.dev/integrations/mcp-server#mcp-server",
+      "repository": "https://github.com/mrge-io/cubic-claude-plugin",
+      "license": "MIT",
+      "keywords": [
+        "code-review",
+        "ai-review",
+        "cubic",
+        "wiki",
+        "security",
+        "codebase-scan",
+        "learnings"
+      ]
+    }
+  ]
+}

@@ -11,9 +11,39 @@ Access cubic's AI code review insights directly from Claude Code. Get PR review 
 
 ## Installation
 
+### From GitHub (recommended)
+
 ```bash
-claude plugin install cubic@cubic-plugin-marketplace
+# Step 1: Add the cubic marketplace
+/plugin marketplace add mrge-io/cubic-claude-plugin
+
+# Step 2: Install the plugin
+/plugin install cubic@cubic-plugin-marketplace
 ```
+
+> **Requires** [Claude Code](https://code.claude.com) v1.0.33+
+
+### Team Auto-Install
+
+To make cubic automatically available for all team members in a repository, add this to your project's `.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "cubic-plugin-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "mrge-io/cubic-claude-plugin"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "cubic@cubic-plugin-marketplace": true
+  }
+}
+```
+
+When team members open the project in Claude Code and trust the repository, they'll be prompted to install the plugin.
 
 ## Setup
 
@@ -60,6 +90,7 @@ The plugin connects to cubic's MCP server, giving Claude access to 9 tools:
 ```
 cubic-claude-plugin/
 ├── .claude-plugin/
+│   ├── marketplace.json   # Marketplace catalog for distribution
 │   └── plugin.json        # Plugin metadata
 ├── .mcp.json              # cubic MCP server configuration
 ├── commands/
