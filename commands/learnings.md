@@ -23,6 +23,6 @@ If a learning ID was provided: $ARGUMENTS
 4. **Explain the context**: Learnings come from three sources:
    - **Senior Reviewer Analysis**: Patterns learned from how senior engineers review code
    - **User Feedback**: Direct corrections from team members on cubic's reviews
-   - **Codebase Scan Feedback**: Insights from triage decisions on scan violations
+   - **Codebase Scan Feedback**: Insights from triage decisions on scan issues
 
 5. **Make it actionable**: When showing learnings, explain how they apply to the user's current work. If they're writing code, highlight which learnings are most relevant.

@@ -1,5 +1,5 @@
 ---
-description: Show cubic codebase scan results and security violations
+description: Show cubic codebase scan results and security issues
 argument-hint: [scan-id]
 allowed-tools: [Bash, cubic:list_scans, cubic:get_scan, cubic:get_violation]
 ---
@@ -18,8 +18,8 @@ If a scan ID was provided: $ARGUMENTS
 
 2. **If a scan ID was provided**: Call `get_scan` with the scanId to get detailed results.
 
-3. **If no scan ID was provided**: Call `list_scans` with the owner and repo to show recent scans. Present them with status, violation count, and date.
+3. **If no scan ID was provided**: Call `list_scans` with the owner and repo to show recent scans. Present them with status, issue count, and date.
 
-4. **Show violations**: When displaying scan results, group violations by category (Security, Data Integrity, Business Logic, Stability). For each violation show severity, file location, and summary.
+4. **Show issues**: When displaying scan results, group issues by category (Security, Data Integrity, Business Logic, Stability). For each issue show severity, file location, and summary.
 
-5. **Dive deeper**: If the user asks about a specific violation, call `get_violation` with the violationId to show the full analysis report, code context, and remediation guidance.
+5. **Dive deeper**: If the user asks about a specific issue, call `get_violation` with the issue's ID to show the full analysis report, code context, and remediation guidance.
