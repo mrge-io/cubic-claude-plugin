@@ -1,11 +1,11 @@
 ---
 name: codebase-context
-description: Use when the user asks about codebase architecture, "how does X work", system design, onboarding to a project, or needs context about how parts of the codebase connect. Queries Cubic's AI Wiki for the current repository to provide architectural context.
+description: Use when the user asks about codebase architecture, "how does X work", system design, onboarding to a project, or needs context about how parts of the codebase connect. Queries cubic's AI Wiki for the current repository to provide architectural context.
 ---
 
 # Codebase Context from Wiki
 
-This skill queries Cubic's AI-generated wiki to provide architectural context about the codebase.
+This skill queries cubic's AI-generated wiki to provide architectural context about the codebase.
 
 ## When to Activate
 
@@ -28,4 +28,4 @@ This skill queries Cubic's AI-generated wiki to provide architectural context ab
 - Summarize the relevant wiki content, don't dump the entire page
 - Reference specific wiki pages so the user can explore further
 - Connect wiki knowledge to the specific files or modules the user is working with
-- If no wiki exists for this repo, suggest the user set one up in the Cubic dashboard
+- If no wiki exists for this repo, suggest the user set one up in the cubic dashboard

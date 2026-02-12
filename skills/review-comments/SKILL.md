@@ -1,11 +1,11 @@
 ---
 name: review-comments
-description: Use when the user says "check cubic comments", "cubic violations", "cubic feedback", "cubic code review", "fix violations", "address review", or is working on a pull request branch with open review comments. Queries Cubic's MCP tools to surface PR review violations relevant to the current work.
+description: Use when the user says "check cubic comments", "cubic violations", "cubic feedback", "cubic code review", "fix violations", "address review", or is working on a pull request branch with open review comments. Queries cubic's MCP tools to surface PR review violations relevant to the current work.
 ---
 
 # PR Review Comments
 
-This skill surfaces AI code review comments and violations from Cubic when working on pull requests.
+This skill surfaces AI code review comments and violations from cubic when working on pull requests.
 
 ## When to Activate
 
@@ -13,7 +13,7 @@ This skill surfaces AI code review comments and violations from Cubic when worki
 - User mentions fixing review comments or addressing feedback
 - User is on a feature branch with an open PR
 - User is editing a file that was flagged in a review
-- User asks what Cubic found or what needs to be fixed
+- User asks what cubic found or what needs to be fixed
 
 ## How to Use
 

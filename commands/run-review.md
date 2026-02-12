@@ -1,12 +1,12 @@
 ---
-description: Run Cubic AI code review on local changes
+description: Run cubic AI code review on local changes
 argument-hint: [-b [branch] | -c <commit> | -p <prompt>]
 allowed-tools: [Bash]
 ---
 
-# Cubic Run Review
+# cubic Run Review
 
-Run a headless Cubic AI code review on local changes using the CLI.
+Run a headless cubic AI code review on local changes using the CLI.
 
 ## Arguments
 

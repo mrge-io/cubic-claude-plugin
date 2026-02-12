@@ -1,10 +1,10 @@
 ---
-description: Browse Cubic AI Wiki documentation for a repository
+description: Browse cubic AI Wiki documentation for a repository
 argument-hint: [page-name]
 allowed-tools: [Bash, cubic:list_wikis, cubic:list_wiki_pages, cubic:get_wiki_page]
 ---
 
-# Cubic Wiki
+# cubic Wiki
 
 Browse the AI-generated wiki documentation for the current repository.
 
@@ -22,4 +22,4 @@ If a page name was provided: $ARGUMENTS
 
 4. **Display the content**: When showing a wiki page, format it clearly with the page title as a header and the full content below.
 
-5. **If no wiki exists**: Tell the user that no wiki has been generated yet for this repository and suggest they set one up in the Cubic dashboard.
+5. **If no wiki exists**: Tell the user that no wiki has been generated yet for this repository and suggest they set one up in the cubic dashboard.
