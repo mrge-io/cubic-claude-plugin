@@ -78,14 +78,6 @@ cubic-claude-plugin/
 └── README.md
 ```
 
-## Development
-
-Test the plugin locally during development:
-
-```bash
-claude --plugin-dir ./cubic-claude-plugin
-```
-
 ## License
 
 MIT
