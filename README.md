@@ -72,7 +72,7 @@ These activate automatically based on what you're doing:
 
 | Skill                 | Triggers when                                  | What it does                                                       |
 | --------------------- | ---------------------------------------------- | ------------------------------------------------------------------ |
-| **review-issues**     | Working on a PR branch, fixing review comments | Surfaces relevant cubic review issues for files you're editing |
+| **review-issues**     | Working on a PR branch, fixing review comments | Surfaces relevant cubic review issues for files you're editing     |
 | **codebase-context**  | Asking about architecture or how things work   | Queries the cubic AI Wiki for architectural context                |
 | **review-patterns**   | Writing or reviewing code                      | Pulls team learnings to apply coding conventions                   |
 

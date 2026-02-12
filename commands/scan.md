@@ -22,4 +22,4 @@ If a scan ID was provided: $ARGUMENTS
 
 4. **Show issues**: When displaying scan results, group issues by category (Security, Data Integrity, Business Logic, Stability). For each issue show severity, file location, and summary.
 
-5. **Dive deeper**: If the user asks about a specific issue, call `get_violation` with the violationId to show the full analysis report, code context, and remediation guidance.
+5. **Dive deeper**: If the user asks about a specific issue, call `get_violation` with the issue's ID to show the full analysis report, code context, and remediation guidance.
