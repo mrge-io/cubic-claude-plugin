@@ -56,6 +56,8 @@ export CUBIC_API_KEY=cbk_your_api_key_here
 
 Add this to your shell profile (`.bashrc`, `.zshrc`, etc.) so it persists across sessions.
 
+> **Tip:** You can also just tell Claude Code "set up my cubic key" and paste your key — the `env-setup` skill will detect your OS and shell and save it automatically.
+
 ## Commands
 
 | Command                          | Description                                                            |
@@ -63,7 +65,7 @@ Add this to your shell profile (`.bashrc`, `.zshrc`, etc.) so it persists across
 | `/cubic:comments [pr-number]`    | Show cubic's review comments on the current PR (auto-detects branch)   |
 | `/cubic:run-review [flags]`      | Run a local cubic AI code review on uncommitted changes or branch diff |
 | `/cubic:wiki [page-name]`        | Browse AI-generated codebase documentation                             |
-| `/cubic:scan [scan-id]`          | View codebase security scan results and issues                         |
+| `/cubic:scan [scan-id]`          | View codebase security scan results and issues                    |
 | `/cubic:learnings [learning-id]` | Show team code review patterns and preferences                         |
 
 ## Skills (Auto-triggered)
@@ -72,18 +74,19 @@ These activate automatically based on what you're doing:
 
 | Skill                 | Triggers when                                  | What it does                                                       |
 | --------------------- | ---------------------------------------------- | ------------------------------------------------------------------ |
-| **review-issues**     | Working on a PR branch, fixing review comments | Surfaces relevant cubic review issues for files you're editing     |
+| **review-issues** | Working on a PR branch, fixing review comments | Surfaces relevant cubic review issues for files you're editing |
 | **codebase-context**  | Asking about architecture or how things work   | Queries the cubic AI Wiki for architectural context                |
 | **review-patterns**   | Writing or reviewing code                      | Pulls team learnings to apply coding conventions                   |
+| **env-setup**         | Setting up cubic, pasting an API key           | Detects OS and shell, persists API key to shell config             |
 
 ## MCP Tools
 
 The plugin connects to cubic's MCP server, giving Claude access to 9 tools:
 
 **Wiki**: `list_wikis`, `list_wiki_pages`, `get_wiki_page`
-**Codebase Scans**: `list_scans`, `get_scan`, `get_issue`
+**Codebase Scans**: `list_scans`, `get_scan`, `get_violation`
 **Review Learnings**: `list_learnings`, `get_learning`
-**PR Reviews**: `get_pr_issues`
+**PR Reviews**: `get_pr_violations`
 
 ## Plugin Structure
 
@@ -104,7 +107,9 @@ cubic-claude-plugin/
 │   │   └── SKILL.md
 │   ├── codebase-context/  # Auto-queries wiki for architecture context
 │   │   └── SKILL.md
-│   └── review-patterns/   # Auto-applies team review learnings
+│   ├── review-patterns/   # Auto-applies team review learnings
+│   │   └── SKILL.md
+│   └── env-setup/         # Auto-detects OS/shell and persists API key
 │       └── SKILL.md
 └── README.md
 ```
