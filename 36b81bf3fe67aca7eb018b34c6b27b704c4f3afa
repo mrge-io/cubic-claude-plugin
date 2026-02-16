@@ -1,0 +1,52 @@
+skills/run-review/SKILL.md
+  a054ff9af2196f84 1-50
+README.md
+  27955c1145002bce 76-81
+  edfe6e328fc54dfe 107-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.3",
+  "base_commit_sha": "36b81bf3fe67aca7eb018b34c6b27b704c4f3afa",
+  "prompts": {
+    "27955c1145002bce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3977e520fffeyK2ZuJgOQV057u-66f90efc-945d-4e15-888a-563cc0d48df8",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 6,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    },
+    "a054ff9af2196f84": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3977e520fffeyK2ZuJgOQV057u-1b3984f8-f2b7-48d2-9e68-0894be9a284e",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 50,
+      "total_deletions": 0,
+      "accepted_lines": 50,
+      "overriden_lines": 0
+    },
+    "edfe6e328fc54dfe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3977e520fffeyK2ZuJgOQV057u-a9f42946-f563-42e5-9aa4-e18557d7b707",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 3,
+      "total_deletions": 1,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}
