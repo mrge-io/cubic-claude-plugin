@@ -17,10 +17,9 @@ This skill runs a local cubic AI code review using the CLI to catch issues befor
 ## How to Use
 
 1. **Check the CLI is installed**: Run `which cubic`.
-   - If not found, tell the user to install it:
-     - macOS / Linux: `curl -fsSL https://cubic.dev/install | bash`
-     - npm / pnpm: `npm install -g @cubic-dev-ai/cli`
-   - After installing, the user needs to authenticate by running `cubic auth` and following the browser login flow. Once done, they can retry.
+   - If not found, install it automatically: `curl -fsSL https://cubic.dev/install | bash`
+   - After installing, verify it's available: `which cubic`
+   - If the user is not yet authenticated, run `cubic auth` and guide them through the browser login flow.
 
 2. **Determine what to review**:
    - Check for uncommitted changes: `git diff --stat`
