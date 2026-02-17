@@ -7,6 +7,7 @@ import {
   installSkills,
   uninstallSkills,
   CUBIC_SKILLS,
+  mergeFlatMcpConfig,
 } from "../utils.js"
 
 const COMMANDS = ["comments.md", "wiki.md", "scan.md", "learnings.md", "run-review.md"]
@@ -15,7 +16,8 @@ export const claude: Target = {
   async install(pluginRoot: string, outputRoot: string): Promise<void> {
     const mcpSource = path.join(pluginRoot, ".mcp.json")
     if (await pathExists(mcpSource)) {
-      await fs.copyFile(mcpSource, path.join(outputRoot, ".mcp.json"))
+      const mcpEntries = await readJson(mcpSource)
+      await mergeFlatMcpConfig(path.join(outputRoot, ".mcp.json"), mcpEntries)
     }
 
     const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"))

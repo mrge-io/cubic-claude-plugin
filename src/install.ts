@@ -40,17 +40,23 @@ export default defineCommand({
       }
     }
 
-    const pluginRoot = await resolvePluginRoot()
+    const { pluginRoot, cloned } = await resolvePluginRoot()
 
     console.log("Installing cubic plugin...\n")
 
-    for (const name of selectedTargets) {
-      const target = targets[name]
-      const outputRoot = args.output
-        ? path.resolve(String(args.output), name)
-        : target.defaultRoot()
-      await fs.mkdir(outputRoot, { recursive: true })
-      await target.install(pluginRoot, outputRoot)
+    try {
+      for (const name of selectedTargets) {
+        const target = targets[name]
+        const outputRoot = args.output
+          ? path.resolve(String(args.output), name)
+          : target.defaultRoot()
+        await fs.mkdir(outputRoot, { recursive: true })
+        await target.install(pluginRoot, outputRoot)
+      }
+    } finally {
+      if (cloned) {
+        await fs.rm(pluginRoot, { recursive: true, force: true })
+      }
     }
 
     console.log("\nNext steps:")
@@ -64,12 +70,12 @@ export default defineCommand({
   },
 })
 
-async function resolvePluginRoot(): Promise<string> {
+async function resolvePluginRoot(): Promise<{ pluginRoot: string; cloned: boolean }> {
   const packageRoot = path.resolve(__dirname, "..")
   if (await pathExists(path.join(packageRoot, ".mcp.json"))) {
-    return packageRoot
+    return { pluginRoot: packageRoot, cloned: false }
   }
-  return await cloneFromGitHub()
+  return { pluginRoot: await cloneFromGitHub(), cloned: true }
 }
 
 async function cloneFromGitHub(): Promise<string> {

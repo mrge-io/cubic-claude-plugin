@@ -167,6 +167,20 @@ export async function uninstallSkills(skillsDir: string): Promise<number> {
   return count
 }
 
+export async function mergeFlatMcpConfig(
+  configPath: string,
+  entries: Record<string, unknown>,
+): Promise<void> {
+  let config: Record<string, unknown> = {}
+  if (await pathExists(configPath)) {
+    config = await readJson(configPath)
+  }
+  config = { ...config, ...entries }
+  const dir = path.dirname(configPath)
+  await fs.mkdir(dir, { recursive: true })
+  await fs.writeFile(configPath, JSON.stringify(config, null, 2) + "\n")
+}
+
 export async function mergeJsonConfig(
   configPath: string,
   mcpEntry: Record<string, unknown>,
