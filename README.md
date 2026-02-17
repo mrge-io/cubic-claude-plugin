@@ -96,7 +96,7 @@ The installer will prompt you for your API key during `npx @cubic-plugin/cubic-p
 
 You can also set `CUBIC_API_KEY` in your environment and the installer will detect it automatically.
 
-> **Tip:** In Claude Code, you can also just say "set up my cubic key" and paste your key — the `env-setup` skill will detect your OS and shell and save it automatically.
+> **Tip:** In Claude Code, you can also just say "set up my cubic key" and paste your key — the installer will detect your OS and shell and save it automatically.
 
 ## Commands
 
@@ -118,7 +118,6 @@ These activate automatically based on what you're doing:
 | **run-review**         | "Review my code", pre-commit/PR quality checks | Runs a local cubic AI code review via CLI and surfaces issues      |
 | **codebase-context**   | Asking about architecture or how things work   | Queries the cubic AI Wiki for architectural context                |
 | **review-patterns**    | Writing or reviewing code                      | Pulls team learnings to apply coding conventions                   |
-| **env-setup**          | Setting up cubic, pasting an API key           | Detects OS and shell, persists API key to shell config             |
 
 ## MCP Tools
 
@@ -150,9 +149,7 @@ cubic-claude-plugin/
 │   │   └── SKILL.md
 │   ├── codebase-context/  # Auto-queries wiki for architecture context
 │   │   └── SKILL.md
-│   ├── review-patterns/   # Auto-applies team review learnings
-│   │   └── SKILL.md
-│   └── env-setup/         # Auto-detects OS/shell and persists API key
+│   └── review-patterns/   # Auto-applies team review learnings
 │       └── SKILL.md
 └── README.md
 ```

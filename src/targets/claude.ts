@@ -22,12 +22,13 @@ export const claude: Target = {
       },
     })
 
-    const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"))
+    const claudeDir = path.join(outputRoot, ".claude")
+    const skillCount = await installSkills(pluginRoot, path.join(claudeDir, "skills"))
 
     const cmdSource = path.join(pluginRoot, "commands")
     let cmdCount = 0
     if (await pathExists(cmdSource)) {
-      const cmdTarget = path.join(outputRoot, "commands")
+      const cmdTarget = path.join(claudeDir, "commands")
       await fs.mkdir(cmdTarget, { recursive: true })
       for (const file of await fs.readdir(cmdSource)) {
         if (!file.endsWith(".md")) continue
@@ -40,9 +41,10 @@ export const claude: Target = {
   },
 
   async uninstall(outputRoot: string): Promise<void> {
-    await uninstallSkills(path.join(outputRoot, "skills"))
+    const claudeDir = path.join(outputRoot, ".claude")
+    await uninstallSkills(path.join(claudeDir, "skills"))
     for (const cmd of COMMANDS) {
-      const p = path.join(outputRoot, "commands", cmd)
+      const p = path.join(claudeDir, "commands", cmd)
       if (await pathExists(p)) await fs.unlink(p)
     }
     await removeMcpFromJsonConfig(path.join(outputRoot, ".mcp.json"), "cubic")

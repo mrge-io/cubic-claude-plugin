@@ -148,7 +148,6 @@ export const CUBIC_SKILLS = [
   "codebase-context",
   "review-and-fix-issues",
   "run-review",
-  "env-setup",
 ]
 
 export async function installSkills(

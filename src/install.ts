@@ -47,16 +47,17 @@ export default defineCommand({
 
     const mcpPath = path.join(pluginRoot, ".mcp.json")
     let originalMcp: string | undefined
-    if (apiKey && (await pathExists(mcpPath))) {
-      originalMcp = await fs.readFile(mcpPath, "utf-8")
-      const mcpConfig = JSON.parse(originalMcp) as Record<string, unknown>
-      inlineApiKey(mcpConfig, apiKey)
-      await fs.writeFile(mcpPath, JSON.stringify(mcpConfig, null, 2) + "\n")
-    }
 
     console.log("Installing cubic plugin...\n")
 
     try {
+      if (apiKey && (await pathExists(mcpPath))) {
+        originalMcp = await fs.readFile(mcpPath, "utf-8")
+        const mcpConfig = JSON.parse(originalMcp) as Record<string, unknown>
+        inlineApiKey(mcpConfig, apiKey)
+        await fs.writeFile(mcpPath, JSON.stringify(mcpConfig, null, 2) + "\n")
+      }
+
       for (const name of selectedTargets) {
         const target = targets[name]
         const outputRoot = args.output
