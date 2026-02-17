@@ -1,0 +1,284 @@
+src/utils.ts
+  cc43f418be1cad54 149
+  4c6ca2d7dbab13c3 5-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.3",
+  "base_commit_sha": "d91b54783244f186b852a66fc34ddd56a863701e",
+  "prompts": {
+    "0c6a34b9391bc009": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-4c1f7ca7-52a8-477b-918b-2294368cdc79",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "28e533b96a17bf83": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-0c6f0ec9-a8d9-46dc-a784-7ac38f77e5a6",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "2bc54f1379b4a850": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-29d375de-725d-4900-9ef4-814ba56d2a17",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "3523c09f658c602c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-a0d0f82c-fe01-4dfe-8fe2-42ad57e5fa78",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "46cdd74832d74f59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-49a43398-5881-40e4-9c2e-7af616ec206f",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    },
+    "4a4cd323b8bd3021": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-e8a6d9a5-010a-42cb-b0ef-6fec48dd9cd7",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "4c6ca2d7dbab13c3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-ea16cd98-2c06-414e-ab38-34b0549147ad",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 18,
+      "overriden_lines": 0
+    },
+    "507735a01e511c22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-9f000a3d-8ca0-41e7-a04a-323807773366",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "628c6a08c3e45d6d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-bf79616f-3474-4381-9aab-5d3ca6d21345",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "62a90b13fbf002eb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-d45e287f-1690-4279-a89e-eac99a3fcfa4",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "62c1a6f4578ac58f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-1db36179-bac0-4764-9d6d-ea6a2c163ef8",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "62fe00fad6f8eef7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-53c3f553-6c50-4713-8f13-1389c11e1aa2",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "6d7e0b5f2a65b05d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-801a9e10-0b0d-4d6b-b0c8-b8dca587eb6f",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "857d19152299ca4f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-3cf0d5ad-5a8e-46b9-af71-423f5b9b37ac",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "8f607b581a0ed10c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-a66c71a9-10f8-4cbf-9865-93b36c6bff5d",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "9637f89ae3aa56a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-5f0fb9e2-af6c-4fa0-8a40-f874f940776e",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "b5f516627ee63764": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-a3efae31-5b90-4b83-abcb-595c5538aea1",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "c761b9ff1e9add15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-69072d18-8e7c-4a7d-96c4-b29df2df685a",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "cc43f418be1cad54": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-398227c3-3c63-4ecf-b8f0-42ed26132021",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "cd823688f9f83bdc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-5af2c9eb-f2f7-4ee5-b369-bd0f0c7e88cb",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "fc9bbcf6fe9e2a0e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3942b94adffeuxv3W3wtEEvZXN-b7d202c8-cdfd-45f0-9714-bf03535c2177",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
