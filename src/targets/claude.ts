@@ -1,4 +1,5 @@
 import path from "path"
+import os from "os"
 import { promises as fs } from "fs"
 import type { Target } from "./index.js"
 import {
@@ -7,17 +8,22 @@ import {
   installSkills,
   uninstallSkills,
   CUBIC_SKILLS,
-  mergeFlatMcpConfig,
+  mergeJsonConfig,
+  removeMcpFromJsonConfig,
 } from "../utils.js"
 
-const COMMANDS = ["comments.md", "wiki.md", "scan.md", "learnings.md", "run-review.md"]
+const COMMANDS = ["cubic-comments.md", "cubic-wiki.md", "cubic-scan.md", "cubic-learnings.md", "cubic-run-review.md"]
+
+function claudeJsonPath(): string {
+  return path.join(os.homedir(), ".claude.json")
+}
 
 export const claude: Target = {
   async install(pluginRoot: string, outputRoot: string): Promise<void> {
     const mcpSource = path.join(pluginRoot, ".mcp.json")
     if (await pathExists(mcpSource)) {
       const mcpEntries = await readJson(mcpSource)
-      await mergeFlatMcpConfig(path.join(outputRoot, ".mcp.json"), mcpEntries)
+      await mergeJsonConfig(claudeJsonPath(), mcpEntries)
     }
 
     const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"))
@@ -29,7 +35,7 @@ export const claude: Target = {
       await fs.mkdir(cmdTarget, { recursive: true })
       for (const file of await fs.readdir(cmdSource)) {
         if (!file.endsWith(".md")) continue
-        await fs.copyFile(path.join(cmdSource, file), path.join(cmdTarget, file))
+        await fs.copyFile(path.join(cmdSource, file), path.join(cmdTarget, `cubic-${file}`))
         cmdCount++
       }
     }
@@ -43,22 +49,11 @@ export const claude: Target = {
       const p = path.join(outputRoot, "commands", cmd)
       if (await pathExists(p)) await fs.unlink(p)
     }
-    const mcpPath = path.join(outputRoot, ".mcp.json")
-    if (await pathExists(mcpPath)) {
-      const config = await readJson(mcpPath)
-      if (config.cubic) {
-        delete config.cubic
-        if (Object.keys(config).length === 0) {
-          await fs.unlink(mcpPath)
-        } else {
-          await fs.writeFile(mcpPath, JSON.stringify(config, null, 2) + "\n")
-        }
-      }
-    }
+    await removeMcpFromJsonConfig(claudeJsonPath(), "cubic")
     console.log("  claude: removed")
   },
 
   defaultRoot(): string {
-    return process.cwd()
+    return path.join(os.homedir(), ".claude")
   },
 }
