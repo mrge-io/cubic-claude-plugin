@@ -129,6 +129,7 @@ export const CUBIC_SKILLS = [
   "review-patterns",
   "codebase-context",
   "review-comments",
+  "run-review",
   "env-setup",
 ]
 

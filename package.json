@@ -1,6 +1,6 @@
 {
   "name": "@cubic-plugin/cubic-plugin",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Install cubic AI code review plugin for OpenCode",
   "type": "module",
   "bin": {
