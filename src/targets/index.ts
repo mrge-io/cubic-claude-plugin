@@ -7,9 +7,13 @@ import { pi } from "./pi.js"
 import { gemini } from "./gemini.js"
 
 export interface Target {
-  install(pluginRoot: string, outputRoot: string): Promise<void>
+  install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<void>
   uninstall(outputRoot: string): Promise<void>
   defaultRoot(): string
+}
+
+export function authHeader(apiKey?: string): string {
+  return apiKey ? `Bearer ${apiKey}` : "Bearer ${CUBIC_API_KEY}"
 }
 
 export const targets: Record<string, Target> = {

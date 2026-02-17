@@ -13,7 +13,7 @@ import {
 const COMMANDS = ["comments.md", "wiki.md", "scan.md", "learnings.md", "run-review.md"]
 
 export const claude: Target = {
-  async install(pluginRoot: string, outputRoot: string): Promise<void> {
+  async install(pluginRoot: string, outputRoot: string, _apiKey?: string): Promise<void> {
     const mcpSource = path.join(pluginRoot, ".mcp.json")
     if (await pathExists(mcpSource)) {
       const mcpEntries = await readJson(mcpSource)
