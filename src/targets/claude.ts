@@ -1,24 +1,26 @@
 import path from "path"
 import { promises as fs } from "fs"
 import type { Target } from "./index.js"
+import { authHeader } from "./index.js"
 import {
   pathExists,
-  readJson,
   installSkills,
   uninstallSkills,
-  CUBIC_SKILLS,
-  mergeFlatMcpConfig,
+  mergeJsonConfig,
+  removeMcpFromJsonConfig,
 } from "../utils.js"
 
 const COMMANDS = ["comments.md", "wiki.md", "scan.md", "learnings.md", "run-review.md"]
 
 export const claude: Target = {
-  async install(pluginRoot: string, outputRoot: string, _apiKey?: string): Promise<void> {
-    const mcpSource = path.join(pluginRoot, ".mcp.json")
-    if (await pathExists(mcpSource)) {
-      const mcpEntries = await readJson(mcpSource)
-      await mergeFlatMcpConfig(path.join(outputRoot, ".mcp.json"), mcpEntries)
-    }
+  async install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<void> {
+    await mergeJsonConfig(path.join(outputRoot, ".mcp.json"), {
+      cubic: {
+        type: "http",
+        url: "https://www.cubic.dev/api/mcp",
+        headers: { Authorization: authHeader(apiKey) },
+      },
+    })
 
     const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"))
 
@@ -43,18 +45,7 @@ export const claude: Target = {
       const p = path.join(outputRoot, "commands", cmd)
       if (await pathExists(p)) await fs.unlink(p)
     }
-    const mcpPath = path.join(outputRoot, ".mcp.json")
-    if (await pathExists(mcpPath)) {
-      const config = await readJson(mcpPath)
-      if (config.cubic) {
-        delete config.cubic
-        if (Object.keys(config).length === 0) {
-          await fs.unlink(mcpPath)
-        } else {
-          await fs.writeFile(mcpPath, JSON.stringify(config, null, 2) + "\n")
-        }
-      }
-    }
+    await removeMcpFromJsonConfig(path.join(outputRoot, ".mcp.json"), "cubic")
     console.log("  claude: removed")
   },
 
