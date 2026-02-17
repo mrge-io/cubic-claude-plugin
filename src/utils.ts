@@ -2,6 +2,24 @@ import { promises as fs } from "fs"
 import path from "path"
 import yaml from "js-yaml"
 
+export function inlineApiKey(
+  mcpConfig: Record<string, unknown>,
+  apiKey: string,
+): void {
+  for (const server of Object.values(mcpConfig)) {
+    if (typeof server !== "object" || server === null) continue
+    const headers = (server as Record<string, unknown>).headers as
+      | Record<string, string>
+      | undefined
+    if (!headers) continue
+    for (const [key, value] of Object.entries(headers)) {
+      if (typeof value === "string") {
+        headers[key] = value.replace(/\$\{CUBIC_API_KEY\}/g, apiKey)
+      }
+    }
+  }
+}
+
 export async function pathExists(p: string): Promise<boolean> {
   try {
     await fs.access(p)
@@ -128,7 +146,7 @@ export async function removeMcpFromConfig(configPath: string): Promise<void> {
 export const CUBIC_SKILLS = [
   "review-patterns",
   "codebase-context",
-  "review-comments",
+  "review-and-fix-issues",
   "run-review",
   "env-setup",
 ]
