@@ -11,11 +11,14 @@ Access cubic's AI code review insights directly from Claude Code. Get PR review 
 
 > **Requires** [Claude Code](https://code.claude.com) v1.0.33+
 
-## OpenCode, Codex, Cursor, Droid, Pi & Gemini Install
+## CLI Install
 
 ```bash
-# Claude Code (default)
+# All targets (default)
 npx @cubic-plugin/cubic-plugin install
+
+# Claude Code
+npx @cubic-plugin/cubic-plugin install --to claude
 
 # OpenCode
 npx @cubic-plugin/cubic-plugin install --to opencode
@@ -34,10 +37,9 @@ npx @cubic-plugin/cubic-plugin install --to pi
 
 # Gemini CLI
 npx @cubic-plugin/cubic-plugin install --to gemini
-
-# All targets at once
-npx @cubic-plugin/cubic-plugin install --to all
 ```
+
+The installer will prompt you for your API key during setup.
 
 To uninstall, use the same `--to` flag:
 
@@ -90,16 +92,11 @@ When team members open the project in Claude Code and trust the repository, they
 
 ## Setup
 
-1. Generate an API key from your [cubic dashboard](https://www.cubic.dev/settings?tab=integrations&integration=mcp)
-2. Set the environment variable:
+The installer will prompt you for your API key during `npx @cubic-plugin/cubic-plugin install`. It opens your browser to the [cubic dashboard](https://www.cubic.dev/settings?tab=integrations&integration=mcp) where you can generate a key, then you paste it in the terminal. The key is saved directly into the MCP configuration.
 
-```bash
-export CUBIC_API_KEY=cbk_your_api_key_here
-```
+You can also set `CUBIC_API_KEY` in your environment and the installer will detect it automatically.
 
-Add this to your shell profile (`.bashrc`, `.zshrc`, etc.) so it persists across sessions.
-
-> **Tip:** You can also just tell Claude Code "set up my cubic key" and paste your key — the `env-setup` skill will detect your OS and shell and save it automatically.
+> **Tip:** In Claude Code, you can also just say "set up my cubic key" and paste your key — the `env-setup` skill will detect your OS and shell and save it automatically.
 
 ## Commands
 
@@ -117,7 +114,7 @@ These activate automatically based on what you're doing:
 
 | Skill                  | Triggers when                                  | What it does                                                       |
 | ---------------------- | ---------------------------------------------- | ------------------------------------------------------------------ |
-| **review-comments**    | Working on a PR branch, fixing review comments | Surfaces relevant cubic review issues for files you're editing     |
+| **review-and-fix-issues** | Working on a PR branch, fixing review comments | Fetches all cubic issues, investigates each, and reports which are worth fixing |
 | **run-review**         | "Review my code", pre-commit/PR quality checks | Runs a local cubic AI code review via CLI and surfaces issues      |
 | **codebase-context**   | Asking about architecture or how things work   | Queries the cubic AI Wiki for architectural context                |
 | **review-patterns**    | Writing or reviewing code                      | Pulls team learnings to apply coding conventions                   |
@@ -147,7 +144,7 @@ cubic-claude-plugin/
 │   ├── scan.md            # /cubic:scan command
 │   └── learnings.md       # /cubic:learnings command
 ├── skills/
-│   ├── review-comments/   # Auto-surfaces PR review issues
+│   ├── review-and-fix-issues/ # Fetches, investigates, and triages PR review issues
 │   │   └── SKILL.md
 │   ├── run-review/        # Runs local AI code review via cubic CLI
 │   │   └── SKILL.md
