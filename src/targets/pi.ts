@@ -2,6 +2,7 @@ import path from "path"
 import os from "os"
 import { promises as fs } from "fs"
 import type { Target } from "./index.js"
+import { authHeader } from "./index.js"
 import {
   parseFrontmatter,
   formatFrontmatter,
@@ -19,7 +20,7 @@ const CUBIC_PROMPTS = [
 ]
 
 export const pi: Target = {
-  async install(pluginRoot: string, outputRoot: string): Promise<void> {
+  async install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<void> {
     const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"))
 
     const cmdSource = path.join(pluginRoot, "commands")
@@ -50,7 +51,7 @@ export const pi: Target = {
           mcpServers: {
             cubic: {
               baseUrl: "https://www.cubic.dev/api/mcp",
-              headers: { Authorization: "Bearer ${CUBIC_API_KEY}" },
+              headers: { Authorization: authHeader(apiKey) },
             },
           },
         },
