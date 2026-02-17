@@ -2,6 +2,49 @@
 
 Access cubic's AI code review insights directly from Claude Code. Get PR review issues, browse AI-generated wikis, check codebase scans, and apply team review learnings — all without leaving your editor.
 
+## Claude Code Install
+
+```bash
+/plugin marketplace add mrge-io/cubic-claude-plugin
+/plugin install cubic@cubic
+```
+
+> **Requires** [Claude Code](https://code.claude.com) v1.0.33+
+
+## OpenCode, Codex, Cursor, Droid, Pi & Gemini Install
+
+```bash
+# Claude Code (default)
+npx @cubic-plugin/cubic-plugin install
+
+# OpenCode
+npx @cubic-plugin/cubic-plugin install --to opencode
+
+# Codex
+npx @cubic-plugin/cubic-plugin install --to codex
+
+# Cursor
+npx @cubic-plugin/cubic-plugin install --to cursor
+
+# Factory Droid
+npx @cubic-plugin/cubic-plugin install --to droid
+
+# Pi
+npx @cubic-plugin/cubic-plugin install --to pi
+
+# Gemini CLI
+npx @cubic-plugin/cubic-plugin install --to gemini
+
+# All targets at once
+npx @cubic-plugin/cubic-plugin install --to all
+```
+
+To uninstall, use the same `--to` flag:
+
+```bash
+npx @cubic-plugin/cubic-plugin uninstall --to opencode
+```
+
 ## Prerequisites
 
 - [Claude Code](https://code.claude.com) v1.0.33+
