@@ -17,12 +17,12 @@ This skill runs a local cubic AI code review using the CLI to catch issues befor
 ## How to Use
 
 1. **Check the CLI is installed**: Run `which cubic`.
-   - If not found, install it automatically: `curl -fsSL https://cubic.dev/install | bash`
+   - If not found, ask the user to install it (e.g., `curl -fsSL https://cubic.dev/install | bash` or `npm install -g @cubic-dev-ai/cli`) before proceeding.
    - After installing, verify it's available: `which cubic`
    - If the user is not yet authenticated, run `cubic auth` and guide them through the browser login flow.
 
 2. **Determine what to review**:
-   - Check for uncommitted changes: `git diff --stat`
+   - Check for uncommitted changes (staged and unstaged): `git status --porcelain`
    - If there are uncommitted changes, review the working directory: `cubic review -j`
    - If there are no uncommitted changes, review the branch against its base: `cubic review -b -j`
 
