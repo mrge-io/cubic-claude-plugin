@@ -1,0 +1,122 @@
+src/targets/claude.ts
+  5d39d134cfc0b21f 25-26,31
+  b660a231fa51d7d6 44-45,47
+README.md
+  91e4a0c6beee8f65 152
+  b6fcfcc8547b7a01 99
+src/install.ts
+  ea167fcaed3648e6 60
+package.json
+  361c04e9e0a1cad3 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.3",
+  "base_commit_sha": "b7996497e388f27941b4adc5e15b5abb4c798ddf",
+  "prompts": {
+    "0e59d6cd2f28534b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_393aa9ebfffelldCNceUpZbPL1-511dc4be-07c9-40b5-88f1-279d70e48b07",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 1,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "361c04e9e0a1cad3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_393e8801effeJ2LahaZqTAcf3x-21378db5-8046-4159-a112-4b78d1224fd9",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "5d39d134cfc0b21f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_393e8801effeJ2LahaZqTAcf3x-146d8a6e-a0ff-4ef8-85e0-7d3b4879faab",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 3,
+      "total_deletions": 2,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "8abc361b47c0a502": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_393aa9ebfffelldCNceUpZbPL1-73227008-73ee-4d18-b302-8f7354e40dab",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 1,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "91e4a0c6beee8f65": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_393aa9ebfffelldCNceUpZbPL1-8a92f2c0-54ed-408c-bf2d-9aa69e919633",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 3,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "b660a231fa51d7d6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_393e8801effeJ2LahaZqTAcf3x-24732978-03e4-4f2e-9668-b9cb6a1e58f8",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 3,
+      "total_deletions": 2,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "b6fcfcc8547b7a01": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_393aa9ebfffelldCNceUpZbPL1-391088c2-184c-43e3-ba58-67a17b0f0d70",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "ea167fcaed3648e6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_393aa9ebfffelldCNceUpZbPL1-fc237689-e8af-4361-93a6-48f34ccdc524",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 6,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
