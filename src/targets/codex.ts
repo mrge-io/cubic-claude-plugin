@@ -49,7 +49,16 @@ export const codex: Target = {
       "",
     ].join("\n")
     await fs.mkdir(outputRoot, { recursive: true })
-    await fs.writeFile(configPath, toml)
+    if (await pathExists(configPath)) {
+      let existing = await fs.readFile(configPath, "utf-8")
+      if (existing.includes("[mcp_servers.cubic]")) {
+        existing = existing.replace(/\[mcp_servers\.cubic\][^\[]*/, "").trim()
+      }
+      const merged = existing.length > 0 ? existing.trimEnd() + "\n\n" + toml : toml
+      await fs.writeFile(configPath, merged)
+    } else {
+      await fs.writeFile(configPath, toml)
+    }
 
     console.log(`  codex: ${skillCount} skills, ${cmdCount} prompts, 1 MCP server`)
   },
