@@ -1,0 +1,36 @@
+src/targets/droid.ts
+  8c3386ef74edaedc 50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.3",
+  "base_commit_sha": "30d1641e4a00d1b6f649a96c719ab6cddf8f937a",
+  "prompts": {
+    "894542aebb5ed501": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_396146330ffegbmJTJF4gMdcX5-b6daaf41-172f-45d3-bfe5-430408235024",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 10,
+      "total_deletions": 12,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "8c3386ef74edaedc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_396146330ffegbmJTJF4gMdcX5-26a16d45-bd95-4446-8b7e-4ae60557f45a",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 8,
+      "total_deletions": 18,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}
