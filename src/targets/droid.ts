@@ -2,12 +2,15 @@ import path from "path"
 import os from "os"
 import { promises as fs } from "fs"
 import type { Target } from "./index.js"
+import { authHeader } from "./index.js"
 import {
   parseFrontmatter,
   formatFrontmatter,
   pathExists,
   installSkills,
   uninstallSkills,
+  mergeJsonConfig,
+  removeMcpFromJsonConfig,
 } from "../utils.js"
 
 const CUBIC_COMMANDS = [
@@ -19,7 +22,7 @@ const CUBIC_COMMANDS = [
 ]
 
 export const droid: Target = {
-  async install(pluginRoot: string, outputRoot: string): Promise<void> {
+  async install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<void> {
     const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"))
 
     const cmdSource = path.join(pluginRoot, "commands")
@@ -41,7 +44,16 @@ export const droid: Target = {
       }
     }
 
-    console.log(`  droid: ${skillCount} skills, ${cmdCount} commands`)
+    await mergeJsonConfig(path.join(outputRoot, "mcp.json"), {
+      cubic: {
+        type: "http",
+        url: "https://www.cubic.dev/api/mcp",
+        headers: { Authorization: authHeader(apiKey) },
+        disabled: false,
+      },
+    })
+
+    console.log(`  droid: ${skillCount} skills, ${cmdCount} commands, 1 MCP server`)
   },
 
   async uninstall(outputRoot: string): Promise<void> {
@@ -50,6 +62,7 @@ export const droid: Target = {
       const p = path.join(outputRoot, "commands", cmd)
       if (await pathExists(p)) await fs.unlink(p)
     }
+    await removeMcpFromJsonConfig(path.join(outputRoot, "mcp.json"), "cubic")
     console.log("  droid: removed")
   },
 

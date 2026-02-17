@@ -1,6 +1,7 @@
 import path from "path"
 import { promises as fs } from "fs"
 import type { Target } from "./index.js"
+import { authHeader } from "./index.js"
 import {
   parseFrontmatter,
   pathExists,
@@ -30,7 +31,7 @@ function toToml(description: string, prompt: string): string {
 }
 
 export const gemini: Target = {
-  async install(pluginRoot: string, outputRoot: string): Promise<void> {
+  async install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<void> {
     const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"))
 
     const cmdSource = path.join(pluginRoot, "commands")
@@ -54,7 +55,7 @@ export const gemini: Target = {
     await mergeJsonConfig(path.join(outputRoot, "settings.json"), {
       cubic: {
         url: "https://www.cubic.dev/api/mcp",
-        headers: { Authorization: "Bearer ${CUBIC_API_KEY}" },
+        headers: { Authorization: authHeader(apiKey) },
       },
     })
 

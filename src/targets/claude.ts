@@ -1,31 +1,34 @@
 import path from "path"
 import { promises as fs } from "fs"
 import type { Target } from "./index.js"
+import { authHeader } from "./index.js"
 import {
   pathExists,
-  readJson,
   installSkills,
   uninstallSkills,
-  CUBIC_SKILLS,
-  mergeFlatMcpConfig,
+  mergeJsonConfig,
+  removeMcpFromJsonConfig,
 } from "../utils.js"
 
 const COMMANDS = ["comments.md", "wiki.md", "scan.md", "learnings.md", "run-review.md"]
 
 export const claude: Target = {
-  async install(pluginRoot: string, outputRoot: string): Promise<void> {
-    const mcpSource = path.join(pluginRoot, ".mcp.json")
-    if (await pathExists(mcpSource)) {
-      const mcpEntries = await readJson(mcpSource)
-      await mergeFlatMcpConfig(path.join(outputRoot, ".mcp.json"), mcpEntries)
-    }
+  async install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<void> {
+    await mergeJsonConfig(path.join(outputRoot, ".mcp.json"), {
+      cubic: {
+        type: "http",
+        url: "https://www.cubic.dev/api/mcp",
+        headers: { Authorization: authHeader(apiKey) },
+      },
+    })
 
-    const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"))
+    const claudeDir = path.join(outputRoot, ".claude")
+    const skillCount = await installSkills(pluginRoot, path.join(claudeDir, "skills"))
 
     const cmdSource = path.join(pluginRoot, "commands")
     let cmdCount = 0
     if (await pathExists(cmdSource)) {
-      const cmdTarget = path.join(outputRoot, "commands")
+      const cmdTarget = path.join(claudeDir, "commands")
       await fs.mkdir(cmdTarget, { recursive: true })
       for (const file of await fs.readdir(cmdSource)) {
         if (!file.endsWith(".md")) continue
@@ -38,23 +41,13 @@ export const claude: Target = {
   },
 
   async uninstall(outputRoot: string): Promise<void> {
-    await uninstallSkills(path.join(outputRoot, "skills"))
+    const claudeDir = path.join(outputRoot, ".claude")
+    await uninstallSkills(path.join(claudeDir, "skills"))
     for (const cmd of COMMANDS) {
-      const p = path.join(outputRoot, "commands", cmd)
+      const p = path.join(claudeDir, "commands", cmd)
       if (await pathExists(p)) await fs.unlink(p)
     }
-    const mcpPath = path.join(outputRoot, ".mcp.json")
-    if (await pathExists(mcpPath)) {
-      const config = await readJson(mcpPath)
-      if (config.cubic) {
-        delete config.cubic
-        if (Object.keys(config).length === 0) {
-          await fs.unlink(mcpPath)
-        } else {
-          await fs.writeFile(mcpPath, JSON.stringify(config, null, 2) + "\n")
-        }
-      }
-    }
+    await removeMcpFromJsonConfig(path.join(outputRoot, ".mcp.json"), "cubic")
     console.log("  claude: removed")
   },
 

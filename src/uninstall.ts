@@ -10,7 +10,7 @@ export default defineCommand({
   args: {
     to: {
       type: "string",
-      default: "claude",
+      default: "all",
       description: `Target: ${TARGET_NAMES.join(", ")}, or "all"`,
     },
     output: {
