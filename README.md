@@ -115,12 +115,13 @@ Add this to your shell profile (`.bashrc`, `.zshrc`, etc.) so it persists across
 
 These activate automatically based on what you're doing:
 
-| Skill                 | Triggers when                                  | What it does                                                       |
-| --------------------- | ---------------------------------------------- | ------------------------------------------------------------------ |
-| **review-issues** | Working on a PR branch, fixing review comments | Surfaces relevant cubic review issues for files you're editing |
-| **codebase-context**  | Asking about architecture or how things work   | Queries the cubic AI Wiki for architectural context                |
-| **review-patterns**   | Writing or reviewing code                      | Pulls team learnings to apply coding conventions                   |
-| **env-setup**         | Setting up cubic, pasting an API key           | Detects OS and shell, persists API key to shell config             |
+| Skill                  | Triggers when                                  | What it does                                                       |
+| ---------------------- | ---------------------------------------------- | ------------------------------------------------------------------ |
+| **review-comments**    | Working on a PR branch, fixing review comments | Surfaces relevant cubic review issues for files you're editing     |
+| **run-review**         | "Review my code", pre-commit/PR quality checks | Runs a local cubic AI code review via CLI and surfaces issues      |
+| **codebase-context**   | Asking about architecture or how things work   | Queries the cubic AI Wiki for architectural context                |
+| **review-patterns**    | Writing or reviewing code                      | Pulls team learnings to apply coding conventions                   |
+| **env-setup**          | Setting up cubic, pasting an API key           | Detects OS and shell, persists API key to shell config             |
 
 ## MCP Tools
 
@@ -146,7 +147,9 @@ cubic-claude-plugin/
 │   ├── scan.md            # /cubic:scan command
 │   └── learnings.md       # /cubic:learnings command
 ├── skills/
-│   ├── review-issues/     # Auto-surfaces PR review issues
+│   ├── review-comments/   # Auto-surfaces PR review issues
+│   │   └── SKILL.md
+│   ├── run-review/        # Runs local AI code review via cubic CLI
 │   │   └── SKILL.md
 │   ├── codebase-context/  # Auto-queries wiki for architecture context
 │   │   └── SKILL.md
