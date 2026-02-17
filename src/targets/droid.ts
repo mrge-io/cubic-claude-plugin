@@ -43,11 +43,24 @@ export const droid: Target = {
       }
     }
 
+    const apiKey = process.env.CUBIC_API_KEY
+    if (!apiKey) {
+      console.warn(
+        "  ⚠ CUBIC_API_KEY not set. Run: export CUBIC_API_KEY=cbk_your_key",
+      )
+      console.warn(
+        "  Then re-run the install to write credentials to mcp.json",
+      )
+    }
+
     await mergeJsonConfig(path.join(outputRoot, "mcp.json"), {
       cubic: {
         type: "http",
         url: "https://www.cubic.dev/api/mcp",
-        headers: { Authorization: "Bearer ${CUBIC_API_KEY}" },
+        ...(apiKey
+          ? { headers: { Authorization: `Bearer ${apiKey}` } }
+          : {}),
+        disabled: false,
       },
     })
 
