@@ -8,6 +8,8 @@ import {
   pathExists,
   installSkills,
   uninstallSkills,
+  mergeJsonConfig,
+  removeMcpFromJsonConfig,
 } from "../utils.js"
 
 const CUBIC_COMMANDS = [
@@ -41,7 +43,15 @@ export const droid: Target = {
       }
     }
 
-    console.log(`  droid: ${skillCount} skills, ${cmdCount} commands`)
+    await mergeJsonConfig(path.join(outputRoot, "mcp.json"), {
+      cubic: {
+        type: "http",
+        url: "https://www.cubic.dev/api/mcp",
+        headers: { Authorization: "Bearer ${CUBIC_API_KEY}" },
+      },
+    })
+
+    console.log(`  droid: ${skillCount} skills, ${cmdCount} commands, 1 MCP server`)
   },
 
   async uninstall(outputRoot: string): Promise<void> {
@@ -50,6 +60,7 @@ export const droid: Target = {
       const p = path.join(outputRoot, "commands", cmd)
       if (await pathExists(p)) await fs.unlink(p)
     }
+    await removeMcpFromJsonConfig(path.join(outputRoot, "mcp.json"), "cubic")
     console.log("  droid: removed")
   },
 
