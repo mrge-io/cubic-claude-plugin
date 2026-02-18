@@ -1,4 +1,5 @@
 ---
+name: comments
 description: Show cubic's review comments on a pull request
 argument-hint: [pr-number]
 allowed-tools: [Bash, cubic:get_pr_issues]
