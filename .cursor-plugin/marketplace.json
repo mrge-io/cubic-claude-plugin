@@ -1,0 +1,17 @@
+{
+  "name": "cubic",
+  "owner": {
+    "name": "cubic",
+    "email": "contact@cubic.dev"
+  },
+  "metadata": {
+    "description": "AI code review insights from cubic — review issues, team wikis, codebase scans, and learnings directly in Cursor."
+  },
+  "plugins": [
+    {
+      "name": "cubic",
+      "source": "./",
+      "description": "AI code review insights from cubic — review issues, team wikis, codebase scans, and learnings directly in Cursor."
+    }
+  ]
+}

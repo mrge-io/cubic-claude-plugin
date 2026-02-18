@@ -1,4 +1,5 @@
 ---
+name: wiki
 description: Browse cubic AI Wiki documentation for a repository
 argument-hint: [page-name]
 allowed-tools: [Bash, cubic:list_wikis, cubic:list_wiki_pages, cubic:get_wiki_page]

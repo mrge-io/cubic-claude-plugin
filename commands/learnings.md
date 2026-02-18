@@ -1,4 +1,5 @@
 ---
+name: learnings
 description: Show what this team cares about in code reviews (cubic learnings)
 argument-hint: [learning-id]
 allowed-tools: [Bash, cubic:list_learnings, cubic:get_learning]

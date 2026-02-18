@@ -1,0 +1,14 @@
+---
+description: Guide for using cubic AI code review tools effectively in your development workflow
+alwaysApply: false
+globs:
+  - "**/*"
+---
+
+cubic-review-workflow:
+
+- Before opening a PR, run `/cubic:run-review` to catch issues early.
+- When working on a PR branch, use `/cubic:comments` to see what cubic flagged.
+- Check `/cubic:learnings` to understand what your team's senior reviewers care about.
+- Use `/cubic:wiki` to get architectural context before making cross-module changes.
+- Address P0 and P1 review issues before requesting human review.
