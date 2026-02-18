@@ -119,7 +119,7 @@ function isSafeRelativePath(value) {
     return false;
   }
   if (value.startsWith("http://") || value.startsWith("https://")) {
-    return true;
+    return false;
   }
   if (path.isAbsolute(value)) {
     return false;
