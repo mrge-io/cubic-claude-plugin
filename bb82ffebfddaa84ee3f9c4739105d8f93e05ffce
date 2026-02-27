@@ -1,0 +1,82 @@
+src/targets/opencode.ts
+  8f3610e30f56d8bf 56
+src/key-setup.ts
+  af1f05dc2e9e2d7d 26-27,29,33-36
+src/utils.ts
+  d04847882cee9c04 324,326,330,337,339,346,360,370
+src/install.ts
+  7ed6ce8876b8d64c 173-178,182,187-188,212
+  e6613d2b0732f9ed 81-82,107-108,129-130,263-264,267,270
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "bb82ffebfddaa84ee3f9c4739105d8f93e05ffce",
+  "prompts": {
+    "7ed6ce8876b8d64c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_35f4cae59ffeskykXKlW2NSuXZ-b05adc22-f104-41c6-a667-f909fe923c84",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 12,
+      "total_deletions": 5,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    },
+    "8f3610e30f56d8bf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_35f481722ffe2LGY56EdLS0DC6-67f540fc-7435-4412-9a75-14895ed2f2fd",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "af1f05dc2e9e2d7d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_35f481722ffe2LGY56EdLS0DC6-90c27b6d-b9d6-40dd-b086-1e101f467735",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 1,
+      "accepted_lines": 7,
+      "overriden_lines": 0
+    },
+    "d04847882cee9c04": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_35f4cae59ffeskykXKlW2NSuXZ-213e1084-be35-40ab-9234-90a4550b1414",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 8,
+      "total_deletions": 54,
+      "accepted_lines": 8,
+      "overriden_lines": 0
+    },
+    "e6613d2b0732f9ed": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_35f481722ffe2LGY56EdLS0DC6-0c60d1cb-6c4a-4b15-b0ba-4a5fa059c86b",
+        "model": "unknown"
+      },
+      "human_author": "sanxroz <san7yx@gmail.com>",
+      "messages": [],
+      "total_additions": 10,
+      "total_deletions": 8,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    }
+  }
+}
