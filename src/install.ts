@@ -78,7 +78,8 @@ export default defineCommand({
             message: msg,
             retryable: false,
           })
-          process.exit(1)
+          process.exitCode = 1
+          return
         }
         throw new Error(msg)
       }
@@ -103,7 +104,8 @@ export default defineCommand({
             message,
             retryable: true,
           })
-          process.exit(1)
+          process.exitCode = 1
+          return
         }
         throw err
       }
@@ -124,7 +126,8 @@ export default defineCommand({
           message,
           retryable: true,
         })
-        process.exit(1)
+        process.exitCode = 1
+        return
       }
       throw err
     }
@@ -167,19 +170,26 @@ export default defineCommand({
 
           if (skillsOnly) {
             const layout = TARGET_LAYOUTS[name]
-            await installReviewSkill(
+            if (!layout) {
+              throw new Error(
+                `No skills-only layout defined for target: ${name}. Add an entry to TARGET_LAYOUTS.`,
+              )
+            }
+            const skillInstalled = await installReviewSkill(
               pluginRoot,
               layout.skillsDir(outputRoot),
             )
-            await installReviewCommand(
+            const commandInstalled = await installReviewCommand(
               pluginRoot,
               layout.commandDir(outputRoot),
               layout,
             )
+            const skills = skillInstalled ? 1 : 0
+            const commands = commandInstalled ? 1 : 0
             entry = {
               agent: name,
-              skills: 1,
-              commands: 1,
+              skills,
+              commands,
               prompts: 0,
               mcpServers: 0,
               status: "ok",
@@ -199,7 +209,7 @@ export default defineCommand({
           emit({ type: "target_result", ...entry })
           if (!jsonMode) {
             if (skillsOnly) {
-              console.log(`  ${name}: 1 skill, 1 command (skills only)`)
+              console.log(`  ${name}: ${entry.skills} skill, ${entry.commands} command (skills only)`)
             } else {
               console.log(formatTargetLine(name, entry))
             }
@@ -250,13 +260,14 @@ export default defineCommand({
         message: `${failed.length} target(s) failed`,
         retryable: true,
       })
-      if (jsonMode) process.exit(1)
+      process.exitCode = 1
+      if (jsonMode) return
     } else {
       emit({ type: "install_completed", ok: true })
-      if (jsonMode) process.exit(0)
+      if (jsonMode) return
     }
 
-    if (!jsonMode) {
+    if (failed.length === 0) {
       if (skillsOnly) {
         console.log(
           "\n✓ Done! Restart your editor to start using cubic skills.",
@@ -274,7 +285,5 @@ export default defineCommand({
         console.log("  2. Restart your editor")
       }
     }
-
-    if (!jsonMode && failed.length > 0) process.exit(1)
   },
 })

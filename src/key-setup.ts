@@ -23,11 +23,17 @@ function ask(question: string): Promise<string> {
 function readStdinLine(): Promise<string> {
   return new Promise((resolve) => {
     const rl = readline.createInterface({ input: process.stdin })
+    let gotLine = false
+
     rl.once("line", (line) => {
+      gotLine = true
       rl.close()
       resolve(line.trim())
     })
-    rl.once("close", () => resolve(""))
+
+    rl.once("close", () => {
+      if (!gotLine) resolve("")
+    })
   })
 }
 

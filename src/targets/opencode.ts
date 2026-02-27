@@ -53,7 +53,7 @@ export const opencode: Target = {
     }
 
 
-    return { skills: skillCount, commands: cmdCount, prompts: 0, mcpServers: 1 }
+    return { skills: skillCount, commands: cmdCount, prompts: 0, mcpServers: (await pathExists(mcpPath)) ? 1 : 0 }
   },
 
   async uninstall(outputRoot: string): Promise<void> {

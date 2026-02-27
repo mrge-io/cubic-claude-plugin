@@ -317,80 +317,33 @@ export const TARGET_LAYOUTS: Record<string, TargetLayout> = {
   },
 }
 
-export async function installCommands(
-  pluginRoot: string,
-  commandDir: string,
-  layout: TargetLayout,
-): Promise<number> {
-  const sourceDir = path.join(pluginRoot, "commands")
-  if (!(await pathExists(sourceDir))) return 0
-
-  await fs.mkdir(commandDir, { recursive: true })
-  let count = 0
-
-  for (const file of await fs.readdir(sourceDir)) {
-    if (!file.endsWith(".md")) continue
-    const targetFilename = layout.commandFilename(file)
-
-    if (layout.commandFormat === "original") {
-      await fs.copyFile(
-        path.join(sourceDir, file),
-        path.join(commandDir, targetFilename),
-      )
-    } else {
-      const content = await fs.readFile(path.join(sourceDir, file), "utf-8")
-      const { data, body } = parseFrontmatter(content)
-
-      if (layout.commandFormat === "stripped") {
-        const stripped: Record<string, unknown> = {}
-        if (data.description) stripped.description = data.description
-        await fs.writeFile(
-          path.join(commandDir, targetFilename),
-          formatFrontmatter(stripped, body),
-        )
-      } else {
-        const escaped = body.trim().replace(/\\/g, "\\\\\\\\").replace(/"""/g, '\\"\\"\\"')
-        const toml = [
-          `description = ${JSON.stringify(String(data.description ?? ""))}`,
-          'prompt = """',
-          escaped,
-          '"""',
-          "",
-        ].join("\n")
-        await fs.writeFile(path.join(commandDir, targetFilename), toml)
-      }
-    }
-    count++
-  }
-
-  return count
-}
 
 export async function installReviewSkill(
   pluginRoot: string,
   skillsDir: string,
-): Promise<void> {
+): Promise<boolean> {
   const source = path.join(pluginRoot, "skills", "run-review", "SKILL.md")
-  if (!(await pathExists(source))) return
+  if (!(await pathExists(source))) return false
   const targetDir = path.join(skillsDir, "run-review")
   await fs.mkdir(targetDir, { recursive: true })
   await fs.copyFile(source, path.join(targetDir, "SKILL.md"))
+  return true
 }
 
 export async function installReviewCommand(
   pluginRoot: string,
   commandDir: string,
   layout: TargetLayout,
-): Promise<void> {
+): Promise<boolean> {
   const source = path.join(pluginRoot, "commands", "run-review.md")
-  if (!(await pathExists(source))) return
+  if (!(await pathExists(source))) return false
   await fs.mkdir(commandDir, { recursive: true })
 
   const targetFilename = layout.commandFilename("run-review.md")
 
   if (layout.commandFormat === "original") {
     await fs.copyFile(source, path.join(commandDir, targetFilename))
-    return
+    return true
   }
 
   const content = await fs.readFile(source, "utf-8")
@@ -404,7 +357,7 @@ export async function installReviewCommand(
       formatFrontmatter(stripped, body),
     )
   } else {
-    const escaped = body.trim().replace(/\\/g, "\\\\\\\\").replace(/"""/g, '\\"\\"\\"')
+    const escaped = body.trim().replace(/\\/g, "\\\\").replace(/"""/g, '\\"\\"\\"')
     const toml = [
       `description = ${JSON.stringify(String(data.description ?? ""))}`,
       'prompt = """',
@@ -414,4 +367,5 @@ export async function installReviewCommand(
     ].join("\n")
     await fs.writeFile(path.join(commandDir, targetFilename), toml)
   }
+  return true
 }
