@@ -1,15 +1,9 @@
 import { defineCommand } from "citty"
 import path from "path"
-import os from "os"
-import { fileURLToPath } from "url"
 import { promises as fs } from "fs"
-import { execFileSync } from "child_process"
-import { pathExists, inlineApiKey } from "./utils.js"
+import { pathExists, inlineApiKey, resolvePluginRoot, installReviewSkill, installReviewCommand, TARGET_LAYOUTS } from "./utils.js"
 import { targets, TARGET_NAMES } from "./targets/index.js"
 import { promptForApiKey } from "./key-setup.js"
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 
 export default defineCommand({
   meta: {
@@ -27,11 +21,17 @@ export default defineCommand({
       alias: "o",
       description: "Output directory (overrides default per-target paths)",
     },
+    "skills-only": {
+      type: "boolean",
+      default: false,
+      description: "Install only skills and commands (no MCP server or API key)",
+    },
   },
   async run({ args }) {
     const targetName = String(args.to)
     const selectedTargets =
       targetName === "all" ? TARGET_NAMES : [targetName]
+    const skillsOnly = Boolean(args["skills-only"])
 
     for (const name of selectedTargets) {
       if (!targets[name]) {
@@ -41,17 +41,17 @@ export default defineCommand({
       }
     }
 
-    const apiKey = await promptForApiKey()
+    const apiKey = skillsOnly ? undefined : await promptForApiKey()
 
     const { pluginRoot, cloned } = await resolvePluginRoot()
 
     const mcpPath = path.join(pluginRoot, ".mcp.json")
     let originalMcp: string | undefined
 
-    console.log("Installing cubic plugin...\n")
+    console.log(skillsOnly ? "Installing cubic skills...\n" : "Installing cubic plugin...\n")
 
     try {
-      if (apiKey && (await pathExists(mcpPath))) {
+      if (!skillsOnly && apiKey && (await pathExists(mcpPath))) {
         originalMcp = await fs.readFile(mcpPath, "utf-8")
         const mcpConfig = JSON.parse(originalMcp) as Record<string, unknown>
         inlineApiKey(mcpConfig, apiKey)
@@ -64,7 +64,15 @@ export default defineCommand({
           ? path.resolve(String(args.output), name)
           : target.defaultRoot()
         await fs.mkdir(outputRoot, { recursive: true })
-        await target.install(pluginRoot, outputRoot, apiKey)
+
+        if (skillsOnly) {
+          const layout = TARGET_LAYOUTS[name]
+          await installReviewSkill(pluginRoot, layout.skillsDir(outputRoot))
+          await installReviewCommand(pluginRoot, layout.commandDir(outputRoot), layout)
+          console.log(`  ${name}: 1 skill, 1 command (skills only)`)
+        } else {
+          await target.install(pluginRoot, outputRoot, apiKey)
+        }
       }
     } finally {
       if (originalMcp) {
@@ -75,7 +83,9 @@ export default defineCommand({
       }
     }
 
-    if (apiKey) {
+    if (skillsOnly) {
+      console.log("\n✓ Done! Restart your editor to start using cubic skills.")
+    } else if (apiKey) {
       console.log("\n✓ Done! Restart your editor to start using cubic.")
     } else {
       console.log("\nNext steps:")
@@ -89,29 +99,3 @@ export default defineCommand({
     }
   },
 })
-
-async function resolvePluginRoot(): Promise<{ pluginRoot: string; cloned: boolean }> {
-  const packageRoot = path.resolve(__dirname, "..")
-  if (await pathExists(path.join(packageRoot, ".mcp.json"))) {
-    return { pluginRoot: packageRoot, cloned: false }
-  }
-  return { pluginRoot: await cloneFromGitHub(), cloned: true }
-}
-
-async function cloneFromGitHub(): Promise<string> {
-  const tempDir = await fs.mkdtemp(
-    path.join(os.tmpdir(), "cubic-plugin-install-"),
-  )
-  const repo = "https://github.com/mrge-io/cubic-claude-plugin"
-  console.log("Fetching latest plugin from GitHub...")
-  try {
-    execFileSync("git", ["clone", "--depth", "1", repo, tempDir], {
-      stdio: "pipe",
-    })
-  } catch (err: unknown) {
-    await fs.rm(tempDir, { recursive: true, force: true })
-    const message = err instanceof Error ? err.message : "Unknown error"
-    throw new Error(`Failed to clone plugin: ${message}`)
-  }
-  return tempDir
-}

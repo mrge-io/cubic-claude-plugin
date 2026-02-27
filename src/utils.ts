@@ -1,5 +1,8 @@
 import { promises as fs } from "fs"
 import path from "path"
+import os from "os"
+import { fileURLToPath } from "url"
+import { execFileSync } from "child_process"
 import yaml from "js-yaml"
 
 export function inlineApiKey(
@@ -225,4 +228,190 @@ export async function removeMcpFromJsonConfig(
   delete servers[key]
   if (Object.keys(servers).length === 0) delete config.mcpServers
   await fs.writeFile(configPath, JSON.stringify(config, null, 2) + "\n")
+}
+
+// --- Plugin root resolution ---
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+export async function resolvePluginRoot(): Promise<{ pluginRoot: string; cloned: boolean }> {
+  const packageRoot = path.resolve(__dirname, "..")
+  if (await pathExists(path.join(packageRoot, ".mcp.json"))) {
+    return { pluginRoot: packageRoot, cloned: false }
+  }
+  return { pluginRoot: await cloneFromGitHub(), cloned: true }
+}
+
+async function cloneFromGitHub(): Promise<string> {
+  const tempDir = await fs.mkdtemp(
+    path.join(os.tmpdir(), "cubic-plugin-install-"),
+  )
+  const repo = "https://github.com/mrge-io/cubic-claude-plugin"
+  console.log("Fetching latest plugin from GitHub...")
+  try {
+    execFileSync("git", ["clone", "--depth", "1", repo, tempDir], {
+      stdio: "pipe",
+    })
+  } catch (err: unknown) {
+    await fs.rm(tempDir, { recursive: true, force: true })
+    const message = err instanceof Error ? err.message : "Unknown error"
+    throw new Error(`Failed to clone plugin: ${message}`)
+  }
+  return tempDir
+}
+
+// --- Skills-only installation ---
+
+export type CommandFormat = "original" | "stripped" | "toml"
+
+export interface TargetLayout {
+  skillsDir: (root: string) => string
+  commandDir: (root: string) => string
+  commandFormat: CommandFormat
+  commandFilename: (source: string) => string
+}
+
+export const TARGET_LAYOUTS: Record<string, TargetLayout> = {
+  claude: {
+    skillsDir: (root) => path.join(root, ".claude", "skills"),
+    commandDir: (root) => path.join(root, ".claude", "commands"),
+    commandFormat: "original",
+    commandFilename: (s) => s,
+  },
+  opencode: {
+    skillsDir: (root) => path.join(root, "skills"),
+    commandDir: (root) => path.join(root, "commands"),
+    commandFormat: "stripped",
+    commandFilename: (s) => `cubic-${s}`,
+  },
+  cursor: {
+    skillsDir: (root) => path.join(root, "skills"),
+    commandDir: (root) => path.join(root, "commands"),
+    commandFormat: "stripped",
+    commandFilename: (s) => `cubic-${s}`,
+  },
+  codex: {
+    skillsDir: (root) => path.join(root, "skills"),
+    commandDir: (root) => path.join(root, "prompts"),
+    commandFormat: "stripped",
+    commandFilename: (s) => `cubic-${s}`,
+  },
+  droid: {
+    skillsDir: (root) => path.join(root, "skills"),
+    commandDir: (root) => path.join(root, "commands"),
+    commandFormat: "stripped",
+    commandFilename: (s) => `cubic-${s}`,
+  },
+  pi: {
+    skillsDir: (root) => path.join(root, "skills"),
+    commandDir: (root) => path.join(root, "prompts"),
+    commandFormat: "stripped",
+    commandFilename: (s) => `cubic-${s}`,
+  },
+  gemini: {
+    skillsDir: (root) => path.join(root, "skills"),
+    commandDir: (root) => path.join(root, "commands"),
+    commandFormat: "toml",
+    commandFilename: (s) => `cubic-${s.replace(/\.md$/, ".toml")}`,
+  },
+}
+
+export async function installCommands(
+  pluginRoot: string,
+  commandDir: string,
+  layout: TargetLayout,
+): Promise<number> {
+  const sourceDir = path.join(pluginRoot, "commands")
+  if (!(await pathExists(sourceDir))) return 0
+
+  await fs.mkdir(commandDir, { recursive: true })
+  let count = 0
+
+  for (const file of await fs.readdir(sourceDir)) {
+    if (!file.endsWith(".md")) continue
+    const targetFilename = layout.commandFilename(file)
+
+    if (layout.commandFormat === "original") {
+      await fs.copyFile(
+        path.join(sourceDir, file),
+        path.join(commandDir, targetFilename),
+      )
+    } else {
+      const content = await fs.readFile(path.join(sourceDir, file), "utf-8")
+      const { data, body } = parseFrontmatter(content)
+
+      if (layout.commandFormat === "stripped") {
+        const stripped: Record<string, unknown> = {}
+        if (data.description) stripped.description = data.description
+        await fs.writeFile(
+          path.join(commandDir, targetFilename),
+          formatFrontmatter(stripped, body),
+        )
+      } else {
+        const escaped = body.trim().replace(/\\/g, "\\\\\\\\").replace(/"""/g, '\\"\\"\\"')
+        const toml = [
+          `description = ${JSON.stringify(String(data.description ?? ""))}`,
+          'prompt = """',
+          escaped,
+          '"""',
+          "",
+        ].join("\n")
+        await fs.writeFile(path.join(commandDir, targetFilename), toml)
+      }
+    }
+    count++
+  }
+
+  return count
+}
+
+export async function installReviewSkill(
+  pluginRoot: string,
+  skillsDir: string,
+): Promise<void> {
+  const source = path.join(pluginRoot, "skills", "run-review", "SKILL.md")
+  if (!(await pathExists(source))) return
+  const targetDir = path.join(skillsDir, "run-review")
+  await fs.mkdir(targetDir, { recursive: true })
+  await fs.copyFile(source, path.join(targetDir, "SKILL.md"))
+}
+
+export async function installReviewCommand(
+  pluginRoot: string,
+  commandDir: string,
+  layout: TargetLayout,
+): Promise<void> {
+  const source = path.join(pluginRoot, "commands", "run-review.md")
+  if (!(await pathExists(source))) return
+  await fs.mkdir(commandDir, { recursive: true })
+
+  const targetFilename = layout.commandFilename("run-review.md")
+
+  if (layout.commandFormat === "original") {
+    await fs.copyFile(source, path.join(commandDir, targetFilename))
+    return
+  }
+
+  const content = await fs.readFile(source, "utf-8")
+  const { data, body } = parseFrontmatter(content)
+
+  if (layout.commandFormat === "stripped") {
+    const stripped: Record<string, unknown> = {}
+    if (data.description) stripped.description = data.description
+    await fs.writeFile(
+      path.join(commandDir, targetFilename),
+      formatFrontmatter(stripped, body),
+    )
+  } else {
+    const escaped = body.trim().replace(/\\/g, "\\\\\\\\").replace(/"""/g, '\\"\\"\\"')
+    const toml = [
+      `description = ${JSON.stringify(String(data.description ?? ""))}`,
+      'prompt = """',
+      escaped,
+      '"""',
+      "",
+    ].join("\n")
+    await fs.writeFile(path.join(commandDir, targetFilename), toml)
+  }
 }
