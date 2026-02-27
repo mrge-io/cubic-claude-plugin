@@ -235,20 +235,20 @@ export async function removeMcpFromJsonConfig(
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-export async function resolvePluginRoot(): Promise<{ pluginRoot: string; cloned: boolean }> {
+export async function resolvePluginRoot(silent?: boolean): Promise<{ pluginRoot: string; cloned: boolean }> {
   const packageRoot = path.resolve(__dirname, "..")
   if (await pathExists(path.join(packageRoot, ".mcp.json"))) {
     return { pluginRoot: packageRoot, cloned: false }
   }
-  return { pluginRoot: await cloneFromGitHub(), cloned: true }
+  return { pluginRoot: await cloneFromGitHub(silent), cloned: true }
 }
 
-async function cloneFromGitHub(): Promise<string> {
+async function cloneFromGitHub(silent?: boolean): Promise<string> {
   const tempDir = await fs.mkdtemp(
     path.join(os.tmpdir(), "cubic-plugin-install-"),
   )
   const repo = "https://github.com/mrge-io/cubic-claude-plugin"
-  console.log("Fetching latest plugin from GitHub...")
+  if (!silent) console.log("Fetching latest plugin from GitHub...")
   try {
     execFileSync("git", ["clone", "--depth", "1", repo, tempDir], {
       stdio: "pipe",

@@ -1,6 +1,6 @@
 import path from "path"
 import { promises as fs } from "fs"
-import type { Target } from "./index.js"
+import type { Target, TargetResult } from "./index.js"
 import { authHeader } from "./index.js"
 import {
   pathExists,
@@ -13,7 +13,7 @@ import {
 const COMMANDS = ["comments.md", "wiki.md", "scan.md", "learnings.md", "run-review.md"]
 
 export const claude: Target = {
-  async install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<void> {
+  async install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<TargetResult> {
     await mergeJsonConfig(path.join(outputRoot, ".mcp.json"), {
       cubic: {
         type: "http",
@@ -37,7 +37,8 @@ export const claude: Target = {
       }
     }
 
-    console.log(`  claude: ${skillCount} skills, ${cmdCount} commands, 1 MCP server`)
+
+    return { skills: skillCount, commands: cmdCount, prompts: 0, mcpServers: 1 }
   },
 
   async uninstall(outputRoot: string): Promise<void> {

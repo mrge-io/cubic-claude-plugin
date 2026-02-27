@@ -1,6 +1,6 @@
 import path from "path"
 import { promises as fs } from "fs"
-import type { Target } from "./index.js"
+import type { Target, TargetResult } from "./index.js"
 import { authHeader } from "./index.js"
 import {
   parseFrontmatter,
@@ -31,7 +31,7 @@ function toToml(description: string, prompt: string): string {
 }
 
 export const gemini: Target = {
-  async install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<void> {
+  async install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<TargetResult> {
     const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"))
 
     const cmdSource = path.join(pluginRoot, "commands")
@@ -59,7 +59,8 @@ export const gemini: Target = {
       },
     })
 
-    console.log(`  gemini: ${skillCount} skills, ${cmdCount} commands, 1 MCP server`)
+
+    return { skills: skillCount, commands: cmdCount, prompts: 0, mcpServers: 1 }
   },
 
   async uninstall(outputRoot: string): Promise<void> {

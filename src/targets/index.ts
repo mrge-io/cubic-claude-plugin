@@ -6,8 +6,15 @@ import { droid } from "./droid.js"
 import { pi } from "./pi.js"
 import { gemini } from "./gemini.js"
 
+export interface TargetResult {
+  skills: number
+  commands: number
+  prompts: number
+  mcpServers: number
+}
+
 export interface Target {
-  install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<void>
+  install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<TargetResult>
   uninstall(outputRoot: string): Promise<void>
   defaultRoot(): string
 }

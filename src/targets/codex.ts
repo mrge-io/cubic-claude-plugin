@@ -1,7 +1,7 @@
 import path from "path"
 import os from "os"
 import { promises as fs } from "fs"
-import type { Target } from "./index.js"
+import type { Target, TargetResult } from "./index.js"
 import { authHeader } from "./index.js"
 import {
   parseFrontmatter,
@@ -20,7 +20,7 @@ const CUBIC_PROMPTS = [
 ]
 
 export const codex: Target = {
-  async install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<void> {
+  async install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<TargetResult> {
     const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"))
 
     const cmdSource = path.join(pluginRoot, "commands")
@@ -61,7 +61,8 @@ export const codex: Target = {
       await fs.writeFile(configPath, toml)
     }
 
-    console.log(`  codex: ${skillCount} skills, ${cmdCount} prompts, 1 MCP server`)
+
+    return { skills: skillCount, commands: 0, prompts: cmdCount, mcpServers: 1 }
   },
 
   async uninstall(outputRoot: string): Promise<void> {

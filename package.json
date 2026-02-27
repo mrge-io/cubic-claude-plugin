@@ -19,7 +19,7 @@
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build",
-    "test": "npm run build && node dist/index.js --help"
+    "test": "npm run build && node --test test/*.test.mjs"
   },
   "dependencies": {
     "citty": "^0.1.6",
