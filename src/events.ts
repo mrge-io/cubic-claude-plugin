@@ -1,0 +1,116 @@
+import { randomUUID } from "crypto"
+
+import type { InstallMethod } from "./utils.js"
+// ── Event types ──────────────────────────────────────────────
+
+export interface InstallStartedEvent {
+  type: "install_started"
+  mode: "full" | "skills-only"
+  method: InstallMethod
+  target: string
+  pluginVersion: string
+}
+
+export interface AuthRequiredEvent {
+  type: "auth_required"
+  method: "api_key"
+  source: "env" | "prompt"
+  hasEnvKey: boolean
+}
+
+export interface AuthOpenUrlEvent {
+  type: "auth_open_url"
+  url: string
+}
+
+export interface AuthPromptEvent {
+  type: "auth_prompt"
+  field: "api_key"
+  masked: true
+}
+
+export interface AuthSuccessEvent {
+  type: "auth_success"
+  source: "env" | "prompt"
+}
+
+export interface AuthWarningEvent {
+  type: "auth_warning"
+  message: string
+}
+
+export interface TargetStartedEvent {
+  type: "target_started"
+  agent: string
+}
+
+export interface TargetResultEvent {
+  type: "target_result"
+  agent: string
+  method: InstallMethod
+  skills: number
+  commands: number
+  prompts: number
+  mcpServers: number
+  status: "ok" | "failed"
+  reason: string | null
+}
+
+export interface InstallSummaryEvent {
+  type: "install_summary"
+  targetsTotal: number
+  targetsSucceeded: number
+  targetsFailed: number
+  skillsTotal: number
+  commandsTotal: number
+  promptsTotal: number
+  mcpServersTotal: number
+  pluginVersion: string
+}
+
+export interface InstallCompletedEvent {
+  type: "install_completed"
+  ok: true
+}
+
+export interface InstallFailedEvent {
+  type: "install_failed"
+  code: string
+  message: string
+  retryable: boolean
+}
+
+export type InstallEvent =
+  | InstallStartedEvent
+  | AuthRequiredEvent
+  | AuthOpenUrlEvent
+  | AuthPromptEvent
+  | AuthSuccessEvent
+  | AuthWarningEvent
+  | TargetStartedEvent
+  | TargetResultEvent
+  | InstallSummaryEvent
+  | InstallCompletedEvent
+  | InstallFailedEvent
+
+// ── Emitter ──────────────────────────────────────────────────
+
+export type Emitter = (event: InstallEvent) => void
+
+export function createEmitter(jsonMode: boolean): Emitter {
+  if (!jsonMode) return () => {}
+
+  const runId = randomUUID().replace(/-/g, "").slice(0, 12)
+
+  return (event: InstallEvent) => {
+    const { type, ...rest } = event
+    const full = {
+      type,
+      version: 1 as const,
+      ts: new Date().toISOString(),
+      runId,
+      ...rest,
+    }
+    process.stdout.write(JSON.stringify(full) + "\n")
+  }
+}

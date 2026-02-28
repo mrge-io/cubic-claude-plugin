@@ -1,6 +1,7 @@
 import readline from "readline"
 import { spawn } from "child_process"
 import os from "os"
+import type { Emitter } from "./events.js"
 
 const CUBIC_URL =
   "https://www.cubic.dev/settings?tab=integrations&integration=mcp"
@@ -14,6 +15,24 @@ function ask(question: string): Promise<string> {
     rl.question(question, (answer) => {
       rl.close()
       resolve(answer.trim())
+    })
+  })
+}
+
+/** Read a single line from stdin without writing a prompt to stdout. */
+function readStdinLine(): Promise<string> {
+  return new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin })
+    let gotLine = false
+
+    rl.once("line", (line) => {
+      gotLine = true
+      rl.close()
+      resolve(line.trim())
+    })
+
+    rl.once("close", () => {
+      if (!gotLine) resolve("")
     })
   })
 }
@@ -47,7 +66,50 @@ function maskKey(key: string): string {
   return key.slice(0, 7) + "..." + key.slice(-4)
 }
 
-export async function promptForApiKey(): Promise<string | undefined> {
+export async function promptForApiKey(
+  emit?: Emitter,
+  jsonMode?: boolean,
+): Promise<string | undefined> {
+  const existing = process.env.CUBIC_API_KEY
+  const hasValidEnvKey = Boolean(existing?.startsWith("cbk_"))
+
+  // ── JSON mode: structured events, no text to stdout ─────────
+  if (jsonMode && emit) {
+    emit({
+      type: "auth_required",
+      method: "api_key",
+      source: hasValidEnvKey ? "env" : "prompt",
+      hasEnvKey: hasValidEnvKey,
+    })
+
+    if (hasValidEnvKey) {
+      emit({ type: "auth_success", source: "env" })
+      return existing
+    }
+
+    emit({ type: "auth_open_url", url: CUBIC_URL })
+    emit({ type: "auth_prompt", field: "api_key", masked: true })
+
+    // Parent writes the key to our stdin after seeing auth_prompt
+    const raw = await readStdinLine()
+    const key = raw.replace(/^["']|["']$/g, "")
+
+    if (!key) {
+      return undefined
+    }
+
+    if (!key.startsWith("cbk_")) {
+      emit({
+        type: "auth_warning",
+        message: "Key doesn't start with 'cbk_'. Double-check your key.",
+      })
+    }
+
+    emit({ type: "auth_success", source: "prompt" })
+    return key
+  }
+
+  // ── Text mode: original interactive UX ──────────────────────
   if (!process.stdin.isTTY) {
     console.log("\n  No TTY detected. Set your API key manually:")
     console.log("    export CUBIC_API_KEY=cbk_your_key_here")
@@ -55,7 +117,6 @@ export async function promptForApiKey(): Promise<string | undefined> {
     return undefined
   }
 
-  const existing = process.env.CUBIC_API_KEY
   if (existing?.startsWith("cbk_")) {
     const answer = await ask(
       `  API key found in environment (${maskKey(existing)}). Use it? [Y/n] `,

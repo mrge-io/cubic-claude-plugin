@@ -37,6 +37,9 @@ npx @cubic-plugin/cubic-plugin install --to pi
 
 # Gemini CLI
 npx @cubic-plugin/cubic-plugin install --to gemini
+
+# Universal (.agents/skills)
+npx @cubic-plugin/cubic-plugin install --to universal
 ```
 
 The installer will prompt you for your API key during setup.

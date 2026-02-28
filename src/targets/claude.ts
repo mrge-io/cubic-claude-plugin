@@ -1,11 +1,13 @@
 import path from "path"
 import { promises as fs } from "fs"
-import type { Target } from "./index.js"
+import type { Target, TargetResult } from "./index.js"
 import { authHeader } from "./index.js"
+import type { InstallMethod } from "../utils.js"
 import {
   pathExists,
   installSkills,
   uninstallSkills,
+  installFile,
   mergeJsonConfig,
   removeMcpFromJsonConfig,
 } from "../utils.js"
@@ -13,7 +15,7 @@ import {
 const COMMANDS = ["comments.md", "wiki.md", "scan.md", "learnings.md", "run-review.md"]
 
 export const claude: Target = {
-  async install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<void> {
+  async install(pluginRoot: string, outputRoot: string, apiKey?: string, method: InstallMethod = "paste"): Promise<TargetResult> {
     await mergeJsonConfig(path.join(outputRoot, ".mcp.json"), {
       cubic: {
         type: "http",
@@ -23,7 +25,7 @@ export const claude: Target = {
     })
 
     const claudeDir = path.join(outputRoot, ".claude")
-    const skillCount = await installSkills(pluginRoot, path.join(claudeDir, "skills"))
+    const skillCount = await installSkills(pluginRoot, path.join(claudeDir, "skills"), method)
 
     const cmdSource = path.join(pluginRoot, "commands")
     let cmdCount = 0
@@ -32,12 +34,13 @@ export const claude: Target = {
       await fs.mkdir(cmdTarget, { recursive: true })
       for (const file of await fs.readdir(cmdSource)) {
         if (!file.endsWith(".md")) continue
-        await fs.copyFile(path.join(cmdSource, file), path.join(cmdTarget, file))
+        await installFile(path.join(cmdSource, file), path.join(cmdTarget, file), method)
         cmdCount++
       }
     }
 
-    console.log(`  claude: ${skillCount} skills, ${cmdCount} commands, 1 MCP server`)
+
+    return { skills: skillCount, commands: cmdCount, prompts: 0, mcpServers: 1 }
   },
 
   async uninstall(outputRoot: string): Promise<void> {

@@ -1,7 +1,8 @@
 import path from "path"
 import os from "os"
 import { promises as fs } from "fs"
-import type { Target } from "./index.js"
+import type { Target, TargetResult } from "./index.js"
+import type { InstallMethod } from "../utils.js"
 import {
   parseFrontmatter,
   formatFrontmatter,
@@ -23,8 +24,8 @@ const CUBIC_COMMANDS = [
 ]
 
 export const opencode: Target = {
-  async install(pluginRoot: string, outputRoot: string, _apiKey?: string): Promise<void> {
-    const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"))
+  async install(pluginRoot: string, outputRoot: string, _apiKey?: string, method: InstallMethod = "paste"): Promise<TargetResult> {
+    const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"), method)
 
     const cmdSource = path.join(pluginRoot, "commands")
     let cmdCount = 0
@@ -52,7 +53,8 @@ export const opencode: Target = {
       await mergeOpenCodeConfig(path.join(outputRoot, "opencode.json"), { mcp: converted })
     }
 
-    console.log(`  opencode: ${skillCount} skills, ${cmdCount} commands, 1 MCP server`)
+
+    return { skills: skillCount, commands: cmdCount, prompts: 0, mcpServers: (await pathExists(mcpPath)) ? 1 : 0 }
   },
 
   async uninstall(outputRoot: string): Promise<void> {

@@ -5,9 +5,18 @@ import { cursor } from "./cursor.js"
 import { droid } from "./droid.js"
 import { pi } from "./pi.js"
 import { gemini } from "./gemini.js"
+import { universal } from "./universal.js"
+
+import type { InstallMethod } from "../utils.js"
+export interface TargetResult {
+  skills: number
+  commands: number
+  prompts: number
+  mcpServers: number
+}
 
 export interface Target {
-  install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<void>
+  install(pluginRoot: string, outputRoot: string, apiKey?: string, method?: InstallMethod): Promise<TargetResult>
   uninstall(outputRoot: string): Promise<void>
   defaultRoot(): string
 }
@@ -24,6 +33,7 @@ export const targets: Record<string, Target> = {
   droid,
   pi,
   gemini,
+  universal,
 }
 
 export const TARGET_NAMES = Object.keys(targets)
