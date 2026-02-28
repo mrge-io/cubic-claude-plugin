@@ -1,4 +1,5 @@
 ---
+name: scan
 description: Show cubic codebase scan results and security issues
 argument-hint: [scan-id]
 allowed-tools: [Bash, cubic:list_scans, cubic:get_scan, cubic:get_issue]

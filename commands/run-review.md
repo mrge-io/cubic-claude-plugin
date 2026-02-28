@@ -1,4 +1,5 @@
 ---
+name: run-review
 description: Run cubic AI code review on local changes
 argument-hint: [-b [branch] | -c <commit> | -p <prompt>]
 allowed-tools: [Bash]

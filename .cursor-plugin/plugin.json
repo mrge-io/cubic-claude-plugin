@@ -1,0 +1,24 @@
+{
+  "name": "cubic",
+  "displayName": "cubic",
+  "version": "1.0.0",
+  "description": "AI code review insights from cubic — review issues, team wikis, codebase scans, and learnings directly in Cursor.",
+  "author": {
+    "name": "cubic",
+    "email": "contact@cubic.dev",
+    "url": "https://www.cubic.dev"
+  },
+  "homepage": "https://docs.cubic.dev/integrations/mcp-server#mcp-server",
+  "repository": "https://github.com/mrge-io/cubic-claude-plugin",
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "ai-review",
+    "cubic",
+    "wiki",
+    "security",
+    "codebase-scan",
+    "learnings"
+  ],
+  "logo": "assets/logo.svg"
+}

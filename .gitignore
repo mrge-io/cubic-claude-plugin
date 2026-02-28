@@ -1,9 +1,18 @@
 node_modules/
 dist/
 bun.lock
-.test-output/
-.cubic-manifest.json
-.agents/
-.claude/
-.cursor/
-.gemini/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# OS and editor
+.DS_Store
+*.swp
+*.swo
+
+# Logs and temp
+*.log
+tmp/
+temp/
