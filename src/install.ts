@@ -8,6 +8,11 @@ import {
   installReviewSkill,
   installReviewCommand,
   TARGET_LAYOUTS,
+  readPluginVersion,
+  writeManifest,
+  type InstallMethod,
+  type ManifestEntry,
+  type CubicManifest,
 } from "./utils.js"
 import { targets, TARGET_NAMES } from "./targets/index.js"
 import { promptForApiKey } from "./key-setup.js"
@@ -30,6 +35,67 @@ function formatTargetLine(name: string, r: ResultEntry): string {
   if (r.mcpServers > 0)
     parts.push(`${r.mcpServers} MCP server${r.mcpServers !== 1 ? "s" : ""}`)
   return `  ${name}: ${parts.join(", ")}`
+}
+
+async function buildManifestEntries(
+  pluginRoot: string,
+  targetName: string,
+  skillsOnly: boolean,
+  method: InstallMethod,
+): Promise<ManifestEntry[]> {
+  const entries: ManifestEntry[] = []
+  const layout = TARGET_LAYOUTS[targetName]
+
+  // Skills
+  const skillsSource = path.join(pluginRoot, "skills")
+  if (await pathExists(skillsSource)) {
+    const dirs = await fs.readdir(skillsSource, { withFileTypes: true })
+    for (const d of dirs) {
+      if (!d.isDirectory()) continue
+      if (await pathExists(path.join(skillsSource, d.name, "SKILL.md"))) {
+        // For skills-only mode, only run-review is installed
+        if (skillsOnly && d.name !== "run-review") continue
+        entries.push({
+          name: d.name,
+          type: "skill",
+          file: path.join("skills", d.name, "SKILL.md"),
+          method,
+        })
+      }
+    }
+  }
+
+  // Commands
+  const cmdsSource = path.join(pluginRoot, "commands")
+  if (await pathExists(cmdsSource)) {
+    const files = await fs.readdir(cmdsSource)
+    for (const file of files) {
+      if (!file.endsWith(".md")) continue
+      // For skills-only mode, only run-review command is installed
+      if (skillsOnly && !file.includes("run-review")) continue
+      const outName = layout ? layout.commandFilename(file) : file
+      // Commands with format transforms (stripped/toml) are always copied, not symlinked
+      const cmdMethod = layout && layout.commandFormat !== "original" ? "paste" as InstallMethod : method
+      entries.push({
+        name: file.replace(/\.md$/, ""),
+        type: "command",
+        file: outName,
+        method: cmdMethod,
+      })
+    }
+  }
+
+  // MCP config (only for full installs)
+  if (!skillsOnly) {
+    entries.push({
+      name: "cubic",
+      type: "mcp-config",
+      file: "mcp-config",
+      method: "paste",
+    })
+  }
+
+  return entries
 }
 
 export default defineCommand({
@@ -59,6 +125,11 @@ export default defineCommand({
       default: false,
       description: "Emit newline-delimited JSON events to stdout",
     },
+    method: {
+      type: "string",
+      default: "paste",
+      description: 'Installation method: "paste" (copy files) or "symlink" (create symlinks)',
+    },
   },
   async run({ args }) {
     const jsonMode = Boolean(args.json)
@@ -67,6 +138,22 @@ export default defineCommand({
     const selectedTargets =
       targetName === "all" ? TARGET_NAMES : [targetName]
     const skillsOnly = Boolean(args["skills-only"])
+    const method = String(args.method) as InstallMethod
+
+    if (method !== "paste" && method !== "symlink") {
+      const msg = `Unknown method: ${method}. Available: paste, symlink`
+      if (jsonMode) {
+        emit({
+          type: "install_failed",
+          code: "UNKNOWN_METHOD",
+          message: msg,
+          retryable: false,
+        })
+        process.exitCode = 1
+        return
+      }
+      throw new Error(msg)
+    }
 
     for (const name of selectedTargets) {
       if (!targets[name]) {
@@ -85,11 +172,7 @@ export default defineCommand({
       }
     }
 
-    emit({
-      type: "install_started",
-      mode: skillsOnly ? "skills-only" : "full",
-      target: targetName,
-    })
+    // install_started is emitted after resolvePluginRoot so we have pluginVersion
 
     let apiKey: string | undefined
     if (!skillsOnly) {
@@ -130,6 +213,31 @@ export default defineCommand({
         return
       }
       throw err
+    }
+
+    const pluginVersion = await readPluginVersion(pluginRoot)
+
+    emit({
+      type: "install_started",
+      mode: skillsOnly ? "skills-only" : "full",
+      method,
+      pluginVersion,
+      target: targetName,
+    })
+
+    if (method === "symlink" && cloned) {
+      const msg = "Symlink requires a local plugin source. Use --method paste or clone the repo first."
+      if (jsonMode) {
+        emit({
+          type: "install_failed",
+          code: "SYMLINK_NO_LOCAL_SOURCE",
+          message: msg,
+          retryable: false,
+        })
+        process.exitCode = 1
+        return
+      }
+      throw new Error(msg)
     }
 
     const mcpPath = path.join(pluginRoot, ".mcp.json")
@@ -178,11 +286,13 @@ export default defineCommand({
             const skillInstalled = await installReviewSkill(
               pluginRoot,
               layout.skillsDir(outputRoot),
+              method,
             )
             const commandInstalled = await installReviewCommand(
               pluginRoot,
               layout.commandDir(outputRoot),
               layout,
+              method,
             )
             const skills = skillInstalled ? 1 : 0
             const commands = commandInstalled ? 1 : 0
@@ -196,7 +306,7 @@ export default defineCommand({
               reason: null,
             }
           } else {
-            const tr = await target.install(pluginRoot, outputRoot, apiKey)
+            const tr = await target.install(pluginRoot, outputRoot, apiKey, method)
             entry = {
               agent: name,
               ...tr,
@@ -204,9 +314,24 @@ export default defineCommand({
               reason: null,
             }
           }
-
           results.push(entry)
-          emit({ type: "target_result", ...entry })
+          emit({ type: "target_result", method, ...entry })
+
+          // Write manifest for this target
+          if (entry.status === "ok") {
+            const manifestEntries = await buildManifestEntries(pluginRoot, name, skillsOnly, method)
+            const manifest: CubicManifest = {
+              manifestVersion: 1,
+              pluginVersion,
+              method,
+              installedAt: new Date().toISOString(),
+              target: name,
+              ...(method === "symlink" ? { pluginRoot } : {}),
+              entries: manifestEntries,
+            }
+            await writeManifest(outputRoot, manifest)
+          }
+
           if (!jsonMode) {
             if (skillsOnly) {
               console.log(`  ${name}: ${entry.skills} skill, ${entry.commands} command (skills only)`)
@@ -226,7 +351,7 @@ export default defineCommand({
             reason,
           }
           results.push(entry)
-          emit({ type: "target_result", ...entry })
+          emit({ type: "target_result", method, ...entry })
           if (!jsonMode) console.log(`  ${name}: failed — ${reason}`)
         }
       }
@@ -244,6 +369,7 @@ export default defineCommand({
 
     emit({
       type: "install_summary",
+      pluginVersion,
       targetsTotal: results.length,
       targetsSucceeded: succeeded.length,
       targetsFailed: failed.length,

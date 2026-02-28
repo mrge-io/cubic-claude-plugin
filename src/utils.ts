@@ -5,6 +5,8 @@ import { fileURLToPath } from "url"
 import { execFileSync } from "child_process"
 import yaml from "js-yaml"
 
+export type InstallMethod = "paste" | "symlink"
+
 export function inlineApiKey(
   mcpConfig: Record<string, unknown>,
   apiKey: string,
@@ -29,6 +31,24 @@ export async function pathExists(p: string): Promise<boolean> {
     return true
   } catch {
     return false
+  }
+}
+
+export async function installFile(
+  source: string,
+  target: string,
+  method: InstallMethod,
+): Promise<void> {
+  if (method === "symlink") {
+    // Remove existing file/symlink before creating new one
+    try { await fs.unlink(target) } catch {}
+    // Resolve real paths to handle OS-level symlinks (e.g. macOS /var -> /private/var)
+    const realTargetDir = await fs.realpath(path.dirname(target))
+    const realSource = await fs.realpath(source)
+    const relative = path.relative(realTargetDir, realSource)
+    await fs.symlink(relative, target)
+  } else {
+    await fs.copyFile(source, target)
   }
 }
 
@@ -156,6 +176,7 @@ export const CUBIC_SKILLS = [
 export async function installSkills(
   pluginRoot: string,
   skillsDir: string,
+  method: InstallMethod = "paste",
 ): Promise<number> {
   const sourceDir = path.join(pluginRoot, "skills")
   if (!(await pathExists(sourceDir))) return 0
@@ -170,7 +191,7 @@ export async function installSkills(
     if (!(await pathExists(skillMd))) continue
     const targetDir = path.join(skillsDir, entry.name)
     await fs.mkdir(targetDir, { recursive: true })
-    await fs.copyFile(skillMd, path.join(targetDir, "SKILL.md"))
+    await installFile(skillMd, path.join(targetDir, "SKILL.md"), method)
     count++
   }
   return count
@@ -315,18 +336,25 @@ export const TARGET_LAYOUTS: Record<string, TargetLayout> = {
     commandFormat: "toml",
     commandFilename: (s) => `cubic-${s.replace(/\.md$/, ".toml")}`,
   },
+  universal: {
+    skillsDir: (root) => path.join(root, ".agents", "skills"),
+    commandDir: (root) => path.join(root, ".agents", "commands"),
+    commandFormat: "stripped",
+    commandFilename: (s) => `cubic-${s}`,
+  },
 }
 
 
 export async function installReviewSkill(
   pluginRoot: string,
   skillsDir: string,
+  method: InstallMethod = "paste",
 ): Promise<boolean> {
   const source = path.join(pluginRoot, "skills", "run-review", "SKILL.md")
   if (!(await pathExists(source))) return false
   const targetDir = path.join(skillsDir, "run-review")
   await fs.mkdir(targetDir, { recursive: true })
-  await fs.copyFile(source, path.join(targetDir, "SKILL.md"))
+  await installFile(source, path.join(targetDir, "SKILL.md"), method)
   return true
 }
 
@@ -334,6 +362,7 @@ export async function installReviewCommand(
   pluginRoot: string,
   commandDir: string,
   layout: TargetLayout,
+  method: InstallMethod = "paste",
 ): Promise<boolean> {
   const source = path.join(pluginRoot, "commands", "run-review.md")
   if (!(await pathExists(source))) return false
@@ -342,7 +371,7 @@ export async function installReviewCommand(
   const targetFilename = layout.commandFilename("run-review.md")
 
   if (layout.commandFormat === "original") {
-    await fs.copyFile(source, path.join(commandDir, targetFilename))
+    await installFile(source, path.join(commandDir, targetFilename), method)
     return true
   }
 
@@ -368,4 +397,65 @@ export async function installReviewCommand(
     await fs.writeFile(path.join(commandDir, targetFilename), toml)
   }
   return true
+}
+
+// --- Manifest tracking ---
+
+export const MANIFEST_FILENAME = ".cubic-manifest.json"
+
+export interface ManifestEntry {
+  name: string
+  type: "skill" | "command" | "prompt" | "mcp-config"
+  /** Relative path from outputRoot */
+  file: string
+  method: InstallMethod
+}
+
+export interface CubicManifest {
+  /** Schema version for forward compat */
+  manifestVersion: 1
+  /** Plugin version from package.json */
+  pluginVersion: string
+  /** Installation method used */
+  method: InstallMethod
+  /** ISO-8601 timestamp */
+  installedAt: string
+  /** Target agent name */
+  target: string
+  /** Source plugin root (absolute path, only present for symlink) */
+  pluginRoot?: string
+  /** Installed items */
+  entries: ManifestEntry[]
+}
+
+export async function readPluginVersion(pluginRoot: string): Promise<string> {
+  try {
+    const pkg = await readJson(path.join(pluginRoot, "package.json"))
+    return String(pkg.version ?? "0.0.0")
+  } catch {
+    return "0.0.0"
+  }
+}
+
+export async function writeManifest(
+  outputRoot: string,
+  manifest: CubicManifest,
+): Promise<void> {
+  await fs.mkdir(outputRoot, { recursive: true })
+  await fs.writeFile(
+    path.join(outputRoot, MANIFEST_FILENAME),
+    JSON.stringify(manifest, null, 2) + "\n",
+  )
+}
+
+export async function readManifest(
+  outputRoot: string,
+): Promise<CubicManifest | null> {
+  const p = path.join(outputRoot, MANIFEST_FILENAME)
+  if (!(await pathExists(p))) return null
+  try {
+    return (await readJson(p)) as unknown as CubicManifest
+  } catch {
+    return null
+  }
 }

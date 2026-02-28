@@ -2,6 +2,7 @@ import path from "path"
 import { promises as fs } from "fs"
 import type { Target, TargetResult } from "./index.js"
 import { authHeader } from "./index.js"
+import type { InstallMethod } from "../utils.js"
 import {
   parseFrontmatter,
   formatFrontmatter,
@@ -21,8 +22,8 @@ const CUBIC_COMMANDS = [
 ]
 
 export const cursor: Target = {
-  async install(pluginRoot: string, outputRoot: string, apiKey?: string): Promise<TargetResult> {
-    const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"))
+  async install(pluginRoot: string, outputRoot: string, apiKey?: string, method: InstallMethod = "paste"): Promise<TargetResult> {
+    const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"), method)
 
     const cmdSource = path.join(pluginRoot, "commands")
     let cmdCount = 0

@@ -89,12 +89,12 @@ describe("install --json --skills-only", () => {
     assert.equal(events[0].target, "all")
 
     const results = events.filter((e) => e.type === "target_result")
-    assert.equal(results.length, 7, "one result per target")
+    assert.equal(results.length, 8, "one result per target")
 
     const summary = events.find((e) => e.type === "install_summary")
-    assert.equal(summary.targetsTotal, 7)
-    assert.equal(summary.skillsTotal, 7)
-    assert.equal(summary.commandsTotal, 7)
+    assert.equal(summary.targetsTotal, 8)
+    assert.equal(summary.skillsTotal, 8)
+    assert.equal(summary.commandsTotal, 8)
   })
 
   it("each NDJSON line is valid JSON parseable by jq", async () => {

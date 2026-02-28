@@ -1,3 +1,9 @@
 node_modules/
 dist/
 bun.lock
+.test-output/
+.cubic-manifest.json
+.agents/
+.claude/
+.cursor/
+.gemini/

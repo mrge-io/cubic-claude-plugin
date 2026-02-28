@@ -1,8 +1,6 @@
 import path from "path"
-import os from "os"
 import { promises as fs } from "fs"
 import type { Target, TargetResult } from "./index.js"
-import { authHeader } from "./index.js"
 import type { InstallMethod } from "../utils.js"
 import {
   parseFrontmatter,
@@ -10,8 +8,6 @@ import {
   pathExists,
   installSkills,
   uninstallSkills,
-  mergeJsonConfig,
-  removeMcpFromJsonConfig,
 } from "../utils.js"
 
 const CUBIC_COMMANDS = [
@@ -22,14 +18,15 @@ const CUBIC_COMMANDS = [
   "cubic-run-review.md",
 ]
 
-export const droid: Target = {
-  async install(pluginRoot: string, outputRoot: string, apiKey?: string, method: InstallMethod = "paste"): Promise<TargetResult> {
-    const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"), method)
+export const universal: Target = {
+  async install(pluginRoot: string, outputRoot: string, _apiKey?: string, method: InstallMethod = "paste"): Promise<TargetResult> {
+    const agentsDir = path.join(outputRoot, ".agents")
+    const skillCount = await installSkills(pluginRoot, path.join(agentsDir, "skills"), method)
 
     const cmdSource = path.join(pluginRoot, "commands")
     let cmdCount = 0
     if (await pathExists(cmdSource)) {
-      const cmdTarget = path.join(outputRoot, "commands")
+      const cmdTarget = path.join(agentsDir, "commands")
       await fs.mkdir(cmdTarget, { recursive: true })
       for (const file of await fs.readdir(cmdSource)) {
         if (!file.endsWith(".md")) continue
@@ -45,30 +42,20 @@ export const droid: Target = {
       }
     }
 
-    await mergeJsonConfig(path.join(outputRoot, "mcp.json"), {
-      cubic: {
-        type: "http",
-        url: "https://www.cubic.dev/api/mcp",
-        headers: { Authorization: authHeader(apiKey) },
-        disabled: false,
-      },
-    })
-
-
-    return { skills: skillCount, commands: cmdCount, prompts: 0, mcpServers: 1 }
+    return { skills: skillCount, commands: cmdCount, prompts: 0, mcpServers: 0 }
   },
 
   async uninstall(outputRoot: string): Promise<void> {
-    await uninstallSkills(path.join(outputRoot, "skills"))
+    const agentsDir = path.join(outputRoot, ".agents")
+    await uninstallSkills(path.join(agentsDir, "skills"))
     for (const cmd of CUBIC_COMMANDS) {
-      const p = path.join(outputRoot, "commands", cmd)
+      const p = path.join(agentsDir, "commands", cmd)
       if (await pathExists(p)) await fs.unlink(p)
     }
-    await removeMcpFromJsonConfig(path.join(outputRoot, "mcp.json"), "cubic")
-    console.log("  droid: removed")
+    console.log("  universal: removed")
   },
 
   defaultRoot(): string {
-    return path.join(os.homedir(), ".factory")
+    return process.cwd()
   },
 }

@@ -1,11 +1,14 @@
 import { randomUUID } from "crypto"
 
+import type { InstallMethod } from "./utils.js"
 // ── Event types ──────────────────────────────────────────────
 
 export interface InstallStartedEvent {
   type: "install_started"
   mode: "full" | "skills-only"
+  method: InstallMethod
   target: string
+  pluginVersion: string
 }
 
 export interface AuthRequiredEvent {
@@ -44,6 +47,7 @@ export interface TargetStartedEvent {
 export interface TargetResultEvent {
   type: "target_result"
   agent: string
+  method: InstallMethod
   skills: number
   commands: number
   prompts: number
@@ -61,6 +65,7 @@ export interface InstallSummaryEvent {
   commandsTotal: number
   promptsTotal: number
   mcpServersTotal: number
+  pluginVersion: string
 }
 
 export interface InstallCompletedEvent {
