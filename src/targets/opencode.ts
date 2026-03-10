@@ -6,9 +6,9 @@ import type { InstallMethod } from "../utils.js"
 import {
   parseFrontmatter,
   formatFrontmatter,
-  convertMcpConfig,
   pathExists,
-  readJson,
+  readPluginMcpConfig,
+  convertMcpConfig,
   mergeOpenCodeConfig,
   removeMcpFromConfig,
   installSkills,
@@ -24,7 +24,13 @@ const CUBIC_COMMANDS = [
 ]
 
 export const opencode: Target = {
-  async install(pluginRoot: string, outputRoot: string, _apiKey?: string, method: InstallMethod = "paste"): Promise<TargetResult> {
+  async install(
+    pluginRoot: string,
+    outputRoot: string,
+    _apiKey?: string,
+    method: InstallMethod = "paste",
+    pluginMcpConfig?: Record<string, Record<string, unknown>>,
+  ): Promise<TargetResult> {
     const skillCount = await installSkills(pluginRoot, path.join(outputRoot, "skills"), method)
 
     const cmdSource = path.join(pluginRoot, "commands")
@@ -46,15 +52,14 @@ export const opencode: Target = {
       }
     }
 
-    const mcpPath = path.join(pluginRoot, ".mcp.json")
-    if (await pathExists(mcpPath)) {
-      const mcpConfig = await readJson(mcpPath)
+    const mcpConfig = pluginMcpConfig ?? await readPluginMcpConfig(pluginRoot, _apiKey)
+    if (mcpConfig) {
       const converted = convertMcpConfig(mcpConfig as Record<string, Record<string, unknown>>)
       await mergeOpenCodeConfig(path.join(outputRoot, "opencode.json"), { mcp: converted })
     }
 
 
-    return { skills: skillCount, commands: cmdCount, prompts: 0, mcpServers: (await pathExists(mcpPath)) ? 1 : 0 }
+    return { skills: skillCount, commands: cmdCount, prompts: 0, mcpServers: mcpConfig ? 1 : 0 }
   },
 
   async uninstall(outputRoot: string): Promise<void> {

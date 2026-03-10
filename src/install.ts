@@ -3,13 +3,13 @@ import path from "path"
 import { promises as fs } from "fs"
 import {
   pathExists,
-  inlineApiKey,
   resolvePluginRoot,
   installReviewSkill,
   installReviewCommand,
   TARGET_LAYOUTS,
   readPluginVersion,
   writeManifest,
+  readPluginMcpConfig,
   type InstallMethod,
   type ManifestEntry,
   type CubicManifest,
@@ -26,6 +26,103 @@ interface ResultEntry {
   mcpServers: number
   status: "ok" | "failed"
   reason: string | null
+}
+
+const DEFAULT_INSTALL_TIMEOUT_MS = 5 * 60 * 1000
+const DEFAULT_TARGET_INSTALL_TIMEOUT_MS = 60 * 1000
+
+class InstallTimeoutError extends Error {
+  readonly code = "INSTALL_TIMEOUT"
+  readonly retryable = true
+
+  constructor(timeoutMs: number) {
+    super(`Timed out while installing cubic plugin after ${Math.floor(timeoutMs / 1000)}s`)
+    this.name = "InstallTimeoutError"
+  }
+}
+
+class TargetInstallTimeoutError extends Error {
+  readonly code = "TARGET_INSTALL_TIMEOUT"
+  readonly retryable = true
+
+  constructor(target: string, timeoutMs: number) {
+    super(`Timed out while installing target '${target}' after ${Math.floor(timeoutMs / 1000)}s`)
+    this.name = "TargetInstallTimeoutError"
+  }
+}
+
+function getTimeoutMs(envName: string, fallbackMs: number): number {
+  const raw = process.env[envName]
+  if (!raw) return fallbackMs
+  const parsed = Number(raw)
+  if (!Number.isFinite(parsed) || parsed <= 0) return fallbackMs
+  return Math.floor(parsed)
+}
+
+function getInstallTimeoutMs(): number {
+  return getTimeoutMs("CUBIC_INSTALL_TIMEOUT_MS", DEFAULT_INSTALL_TIMEOUT_MS)
+}
+
+function getTargetInstallTimeoutMs(): number {
+  return getTimeoutMs(
+    "CUBIC_TARGET_INSTALL_TIMEOUT_MS",
+    DEFAULT_TARGET_INSTALL_TIMEOUT_MS,
+  )
+}
+
+async function maybeDelayForTest(envName: string): Promise<void> {
+  if (process.env.NODE_ENV !== "test") return
+  const delayMs = getTimeoutMs(envName, 0)
+  if (delayMs <= 0) return
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, delayMs)
+  })
+}
+
+async function flushOutputs(): Promise<void> {
+  await Promise.all([
+    new Promise<void>((resolve) => process.stdout.write("", () => resolve())),
+    new Promise<void>((resolve) => process.stderr.write("", () => resolve())),
+  ])
+}
+
+async function withTimeout<T>(
+  operation: Promise<T>,
+  timeoutMs: number,
+  createError: () => Error,
+): Promise<T> {
+  return await new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(createError())
+    }, timeoutMs)
+
+    operation.then(
+      (value) => {
+        clearTimeout(timer)
+        resolve(value)
+      },
+      (error: unknown) => {
+        clearTimeout(timer)
+        reject(error)
+      },
+    )
+  })
+}
+
+async function bestEffortCleanup(params: {
+  pluginRoot?: string
+  cloned: boolean
+}): Promise<void> {
+  const cleanupTasks: Promise<unknown>[] = []
+
+  if (params.cloned && params.pluginRoot) {
+    cleanupTasks.push(
+      fs.rm(params.pluginRoot, { recursive: true, force: true }).catch(() => {}),
+    )
+  }
+
+  if (cleanupTasks.length === 0) return
+  await Promise.all(cleanupTasks)
 }
 
 function formatTargetLine(name: string, r: ResultEntry): string {
@@ -139,6 +236,8 @@ export default defineCommand({
       targetName === "all" ? TARGET_NAMES : [targetName]
     const skillsOnly = Boolean(args["skills-only"])
     const method = String(args.method) as InstallMethod
+    const installTimeoutMs = getInstallTimeoutMs()
+    const targetInstallTimeoutMs = getTargetInstallTimeoutMs()
 
     if (method !== "paste" && method !== "symlink") {
       const msg = `Unknown method: ${method}. Available: paste, symlink`
@@ -181,11 +280,25 @@ export default defineCommand({
       } catch (err) {
         if (jsonMode) {
           const message = err instanceof Error ? err.message : String(err)
+          const code =
+            typeof err === "object" &&
+            err !== null &&
+            "code" in err &&
+            typeof (err as { code: unknown }).code === "string"
+              ? (err as { code: string }).code
+              : "AUTH_FAILED"
+          const retryable =
+            typeof err === "object" &&
+            err !== null &&
+            "retryable" in err &&
+            typeof (err as { retryable: unknown }).retryable === "boolean"
+              ? (err as { retryable: boolean }).retryable
+              : true
           emit({
             type: "install_failed",
-            code: "AUTH_FAILED",
+            code,
             message,
-            retryable: true,
+            retryable,
           })
           process.exitCode = 1
           return
@@ -240,8 +353,35 @@ export default defineCommand({
       throw new Error(msg)
     }
 
-    const mcpPath = path.join(pluginRoot, ".mcp.json")
-    let originalMcp: string | undefined
+    let installPhaseFinished = false
+    let installTimedOut = false
+
+    const installWatchdog = setTimeout(() => {
+      if (installPhaseFinished) return
+      installTimedOut = true
+      const error = new InstallTimeoutError(installTimeoutMs)
+      void bestEffortCleanup({
+        pluginRoot,
+        cloned,
+      }).finally(() => {
+        if (jsonMode) {
+          emit({
+            type: "install_failed",
+            code: error.code,
+            message: error.message,
+            retryable: error.retryable,
+          })
+        } else {
+          console.error(`\n✗ ${error.message}`)
+          console.error(
+            "  You can retry setup, or set CUBIC_API_KEY and run the installer manually.",
+          )
+        }
+        void flushOutputs().finally(() => {
+          process.exit(1)
+        })
+      })
+    }, installTimeoutMs)
 
     if (!jsonMode) {
       console.log(
@@ -252,17 +392,12 @@ export default defineCommand({
     }
 
     const results: ResultEntry[] = []
+    const pluginMcpConfig = !skillsOnly
+      ? await readPluginMcpConfig(pluginRoot, apiKey)
+      : undefined
 
     try {
-      if (!skillsOnly && apiKey && (await pathExists(mcpPath))) {
-        originalMcp = await fs.readFile(mcpPath, "utf-8")
-        const mcpConfig = JSON.parse(originalMcp) as Record<string, unknown>
-        inlineApiKey(mcpConfig, apiKey)
-        await fs.writeFile(
-          mcpPath,
-          JSON.stringify(mcpConfig, null, 2) + "\n",
-        )
-      }
+      await maybeDelayForTest("CUBIC_TEST_INSTALL_DELAY_MS")
 
       for (const name of selectedTargets) {
         const target = targets[name]
@@ -274,46 +409,59 @@ export default defineCommand({
         emit({ type: "target_started", agent: name })
 
         try {
-          let entry: ResultEntry
+          const entry = await withTimeout(
+            (async (): Promise<ResultEntry> => {
+              await maybeDelayForTest("CUBIC_TEST_TARGET_INSTALL_DELAY_MS")
 
-          if (skillsOnly) {
-            const layout = TARGET_LAYOUTS[name]
-            if (!layout) {
-              throw new Error(
-                `No skills-only layout defined for target: ${name}. Add an entry to TARGET_LAYOUTS.`,
+              if (skillsOnly) {
+                const layout = TARGET_LAYOUTS[name]
+                if (!layout) {
+                  throw new Error(
+                    `No skills-only layout defined for target: ${name}. Add an entry to TARGET_LAYOUTS.`,
+                  )
+                }
+                const skillInstalled = await installReviewSkill(
+                  pluginRoot,
+                  layout.skillsDir(outputRoot),
+                  method,
+                )
+                const commandInstalled = await installReviewCommand(
+                  pluginRoot,
+                  layout.commandDir(outputRoot),
+                  layout,
+                  method,
+                )
+                const skills = skillInstalled ? 1 : 0
+                const commands = commandInstalled ? 1 : 0
+                return {
+                  agent: name,
+                  skills,
+                  commands,
+                  prompts: 0,
+                  mcpServers: 0,
+                  status: "ok",
+                  reason: null,
+                }
+              }
+
+              const tr = await target.install(
+                pluginRoot,
+                outputRoot,
+                apiKey,
+                method,
+                pluginMcpConfig,
               )
-            }
-            const skillInstalled = await installReviewSkill(
-              pluginRoot,
-              layout.skillsDir(outputRoot),
-              method,
-            )
-            const commandInstalled = await installReviewCommand(
-              pluginRoot,
-              layout.commandDir(outputRoot),
-              layout,
-              method,
-            )
-            const skills = skillInstalled ? 1 : 0
-            const commands = commandInstalled ? 1 : 0
-            entry = {
-              agent: name,
-              skills,
-              commands,
-              prompts: 0,
-              mcpServers: 0,
-              status: "ok",
-              reason: null,
-            }
-          } else {
-            const tr = await target.install(pluginRoot, outputRoot, apiKey, method)
-            entry = {
-              agent: name,
-              ...tr,
-              status: "ok",
-              reason: null,
-            }
-          }
+              return {
+                agent: name,
+                ...tr,
+                status: "ok",
+                reason: null,
+              }
+            })(),
+            targetInstallTimeoutMs,
+            () => new TargetInstallTimeoutError(name, targetInstallTimeoutMs),
+          )
+
           results.push(entry)
           emit({ type: "target_result", method, ...entry })
 
@@ -356,11 +504,13 @@ export default defineCommand({
         }
       }
     } finally {
-      if (originalMcp) {
-        await fs.writeFile(mcpPath, originalMcp)
-      }
-      if (cloned) {
-        await fs.rm(pluginRoot, { recursive: true, force: true })
+      clearTimeout(installWatchdog)
+      if (!installTimedOut) {
+        installPhaseFinished = true
+        await bestEffortCleanup({
+          pluginRoot,
+          cloned,
+        })
       }
     }
 

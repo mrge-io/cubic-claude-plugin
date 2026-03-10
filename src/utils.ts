@@ -57,6 +57,18 @@ export async function readJson(p: string): Promise<Record<string, unknown>> {
   return JSON.parse(content)
 }
 
+export async function readPluginMcpConfig(
+  pluginRoot: string,
+  apiKey?: string,
+): Promise<Record<string, Record<string, unknown>> | undefined> {
+  const mcpPath = path.join(pluginRoot, ".mcp.json")
+  if (!(await pathExists(mcpPath))) return undefined
+
+  const config = await readJson(mcpPath) as Record<string, Record<string, unknown>>
+  if (apiKey) inlineApiKey(config as Record<string, unknown>, apiKey)
+  return config
+}
+
 export function parseFrontmatter(content: string): {
   data: Record<string, unknown>
   body: string
@@ -256,6 +268,16 @@ export async function removeMcpFromJsonConfig(
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+const DEFAULT_PLUGIN_CLONE_TIMEOUT_MS = 90 * 1000
+
+function getPluginCloneTimeoutMs(): number {
+  const raw = process.env.CUBIC_PLUGIN_CLONE_TIMEOUT_MS
+  if (!raw) return DEFAULT_PLUGIN_CLONE_TIMEOUT_MS
+  const parsed = Number(raw)
+  if (!Number.isFinite(parsed) || parsed <= 0) return DEFAULT_PLUGIN_CLONE_TIMEOUT_MS
+  return Math.floor(parsed)
+}
+
 export async function resolvePluginRoot(silent?: boolean): Promise<{ pluginRoot: string; cloned: boolean }> {
   const packageRoot = path.resolve(__dirname, "..")
   if (await pathExists(path.join(packageRoot, ".mcp.json"))) {
@@ -270,13 +292,18 @@ async function cloneFromGitHub(silent?: boolean): Promise<string> {
   )
   const repo = "https://github.com/mrge-io/cubic-claude-plugin"
   if (!silent) console.log("Fetching latest plugin from GitHub...")
+  const timeoutMs = getPluginCloneTimeoutMs()
   try {
     execFileSync("git", ["clone", "--depth", "1", repo, tempDir], {
       stdio: "pipe",
+      timeout: timeoutMs,
     })
   } catch (err: unknown) {
     await fs.rm(tempDir, { recursive: true, force: true })
-    const message = err instanceof Error ? err.message : "Unknown error"
+    const message =
+      err instanceof Error
+        ? err.message
+        : `Unknown error (timeout: ${Math.floor(timeoutMs / 1000)}s)`
     throw new Error(`Failed to clone plugin: ${message}`)
   }
   return tempDir

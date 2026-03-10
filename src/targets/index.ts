@@ -16,7 +16,13 @@ export interface TargetResult {
 }
 
 export interface Target {
-  install(pluginRoot: string, outputRoot: string, apiKey?: string, method?: InstallMethod): Promise<TargetResult>
+  install(
+    pluginRoot: string,
+    outputRoot: string,
+    apiKey?: string,
+    method?: InstallMethod,
+    pluginMcpConfig?: Record<string, Record<string, unknown>>,
+  ): Promise<TargetResult>
   uninstall(outputRoot: string): Promise<void>
   defaultRoot(): string
 }
