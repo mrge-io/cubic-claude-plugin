@@ -6,6 +6,18 @@ import type { Emitter } from "./events.js"
 const CUBIC_URL =
   "https://www.cubic.dev/settings?tab=integrations&integration=mcp"
 
+const DEFAULT_JSON_INPUT_TIMEOUT_MS = 2 * 60 * 1000
+
+class ApiKeyPromptTimeoutError extends Error {
+  readonly code = "AUTH_PROMPT_TIMEOUT"
+  readonly retryable = true
+
+  constructor(message = "Timed out waiting for API key input") {
+    super(message)
+    this.name = "ApiKeyPromptTimeoutError"
+  }
+}
+
 function ask(question: string): Promise<string> {
   return new Promise((resolve) => {
     const rl = readline.createInterface({
@@ -20,20 +32,47 @@ function ask(question: string): Promise<string> {
 }
 
 /** Read a single line from stdin without writing a prompt to stdout. */
-function readStdinLine(): Promise<string> {
+function getJsonInputTimeoutMs(): number {
+  const raw = process.env.CUBIC_AUTH_PROMPT_TIMEOUT_MS
+  if (!raw) return DEFAULT_JSON_INPUT_TIMEOUT_MS
+  const parsed = Number(raw)
+  if (!Number.isFinite(parsed) || parsed <= 0) return DEFAULT_JSON_INPUT_TIMEOUT_MS
+  return Math.floor(parsed)
+}
+
+function readStdinLine(timeoutMs?: number): Promise<{ line: string; timedOut: boolean }> {
   return new Promise((resolve) => {
     const rl = readline.createInterface({ input: process.stdin })
     let gotLine = false
+    let timeout: NodeJS.Timeout | undefined
+    let timedOut = false
+
+    const finish = (line: string, timedOutInput = false): void => {
+      if (gotLine) return
+      gotLine = true
+      timedOut = timedOutInput
+      if (timeout) clearTimeout(timeout)
+      rl.close()
+      resolve({ line: line.trim(), timedOut })
+    }
 
     rl.once("line", (line) => {
-      gotLine = true
-      rl.close()
-      resolve(line.trim())
+      finish(line)
     })
 
     rl.once("close", () => {
-      if (!gotLine) resolve("")
+      if (gotLine) return
+      if (timeout) clearTimeout(timeout)
+      gotLine = true
+      resolve({ line: "", timedOut })
     })
+
+    if (typeof timeoutMs === "number" && timeoutMs > 0) {
+      timeout = setTimeout(() => {
+        finish("", true)
+      }, timeoutMs)
+      timeout.unref()
+    }
   })
 }
 
@@ -91,11 +130,19 @@ export async function promptForApiKey(
     emit({ type: "auth_prompt", field: "api_key", masked: true })
 
     // Parent writes the key to our stdin after seeing auth_prompt
-    const raw = await readStdinLine()
-    const key = raw.replace(/^["']|["']$/g, "")
+    const timeoutMs = getJsonInputTimeoutMs()
+    const { line, timedOut } = await readStdinLine(timeoutMs)
+    const key = line.replace(/^["']|["']$/g, "")
 
     if (!key) {
-      return undefined
+      if (timedOut) {
+        throw new ApiKeyPromptTimeoutError(
+          `Timed out waiting for API key input after ${Math.floor(timeoutMs / 1000)}s`,
+        )
+      }
+      throw new ApiKeyPromptTimeoutError(
+        "No API key input received on stdin",
+      )
     }
 
     if (!key.startsWith("cbk_")) {
